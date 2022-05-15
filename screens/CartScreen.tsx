@@ -2,9 +2,9 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 import { Text, View } from "../components/Themed";
 import { Image, FlatList } from "react-native";
 import { RootTabScreenProps } from "../types";
-import cookies from '../assets/images/cookies_nobg.png';
-import icecreambar from '../assets/images/icecreambar_nobg.png';
-import icecream from '../assets/images/ice-cream_nobg.png';
+import cookies from '../assets/images/ice-cream_nobg.png';
+import icecreambar from '../assets/images/icecreamcones_nobg.png';
+import icecream from '../assets/images/icecreambar_nobg.png';
 import cones from '../assets/images/icecreamcones_nobg.png';
 import { useState } from "react";
 

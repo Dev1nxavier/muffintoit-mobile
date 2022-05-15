@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
+    "facebookScheme": "fb415066556812293",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",

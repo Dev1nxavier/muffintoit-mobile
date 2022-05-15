@@ -16,6 +16,8 @@ export default function useCachedResources() {
         await Font.loadAsync({
           ...FontAwesome.font,
           'space-mono': require('../assets/fonts/SpaceMono-Regular.ttf'),
+          'merienda-bold': require('../assets/fonts/Merienda-Bold.ttf'),
+          'merienda': require('../assets/fonts/Merienda-Regular.ttf'),
         });
       } catch (e) {
         // We might want to provide this error information to an error reporting service

@@ -15,16 +15,26 @@ const linking: LinkingOptions<RootStackParamList> = {
     screens: {
       Root: {
         screens: {
-          TabOne: {
+          GoogleLogin: {
             screens: {
               TabOneScreen: 'one',
             },
           },
-          TabTwo: {
+          Products: {
             screens: {
               TabTwoScreen: 'two',
             },
           },
+          Cart:{
+            screens:{
+              CartScreen: 'three'
+            }
+          },
+          Details:{
+            screens:{
+              ProductDetailsScreen: 'four'
+            }
+          }
         },
       },
       Modal: 'modal',

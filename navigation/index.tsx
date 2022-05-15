@@ -16,9 +16,13 @@ import ModalScreen from '../screens/ModalScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import TabOneScreen from '../screens/TabOneScreen';
 import TabTwoScreen from '../screens/TabTwoScreen';
+import ProductsScreen from '../screens/ProductsScreen';
+import CategoriesScreen from '../screens/CategoriesScreen';
 import Cart from '../screens/CartScreen';
+
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
+import ProductDetailsScreen from '../screens/ProductDetailsScreen';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -38,9 +42,31 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{
+      headerStyle: {backgroundColor: '#351401'},
+      headerTintColor:'white',
+      contentStyle: {backgroundColor: '#3f2f25'} 
+    }}>
       <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
+      <Stack.Screen name="Products" component={ProductsScreen} options={
+        ({route, navigation})=>({
+          title: route?.params?.name})}/>
+      <Stack.Screen name='Categories' component={CategoriesScreen}/>
+      <Stack.Screen name="Details" component={ProductDetailsScreen} options={
+        ({route, navigation})=>({
+          headerRight:()=>(<Pressable
+          onPress={()=>console.log("update with add to cart function")}
+          style={({pressed})=>({
+            opacity: pressed? 0.5: 1,
+          })}>
+            <FontAwesome
+                name="cart-plus"
+                size={25}
+                color={'white'}
+                style={{ marginRight: 15 }}
+              />
+          </Pressable>)})}/>
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="Modal" component={ModalScreen} />
       </Stack.Group>
@@ -59,9 +85,11 @@ function BottomTabNavigator() {
 
   return (
     <BottomTab.Navigator
-      initialRouteName="TabOne"
+      initialRouteName="GoogleLogin"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
+        headerStyle: {backgroundColor: '#351401'},
+        headerTintColor:'white',
       }}>
       
       <BottomTab.Screen
@@ -77,9 +105,9 @@ function BottomTabNavigator() {
                 opacity: pressed ? 0.5 : 1,
               })}>
               <FontAwesome
-                name="info-circle"
+                name="user-secret"
                 size={25}
-                color={Colors[colorScheme].text}
+                color={'white'}
                 style={{ marginRight: 15 }}
               />
             </Pressable>
@@ -89,11 +117,11 @@ function BottomTabNavigator() {
 
 
       <BottomTab.Screen
-        name="TabOne"
+        name="GoogleLogin"
         component={TabOneScreen}
-        options={({ navigation }: RootTabScreenProps<'TabOne'>) => ({
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+        options={({ navigation }: RootTabScreenProps<'GoogleLogin'>) => ({
+          title: 'Login with Google',
+          tabBarIcon: ({ color }) => <TabBarIcon name="google" color={color} />,
           headerRight: () => (
             <Pressable
               onPress={() => navigation.navigate('Modal')}
@@ -101,9 +129,9 @@ function BottomTabNavigator() {
                 opacity: pressed ? 0.5 : 1,
               })}>
               <FontAwesome
-                name="info-circle"
+                name="user-secret"
                 size={25}
-                color={Colors[colorScheme].text}
+                color={'white'}
                 style={{ marginRight: 15 }}
               />
             </Pressable>
@@ -111,11 +139,11 @@ function BottomTabNavigator() {
         })}
       />
       <BottomTab.Screen
-        name="TabTwo"
-        component={TabTwoScreen}
+        name="Categories"
+        component={CategoriesScreen}
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'All categories',
+          tabBarIcon: ({ color }) => <TabBarIcon name="th-large" color={color} />,
         }}
       />
     </BottomTab.Navigator>
