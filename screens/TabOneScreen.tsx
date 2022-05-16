@@ -8,13 +8,13 @@ import WebBrowser from 'expo-web-browser';
 
 export default function TabOneScreen({ navigation }: RootTabScreenProps<'GoogleLogin'>) {
 
-  // WebBrowser.maybeCompleteAuthSession();
+  console.log("client:", process.env.EXPO_GOOGLE_CLIENT_ID);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    expoClientId:'639060091344-pnqrb3tqatejq0qermb1836f7hoi1lrp.apps.googleusercontent.com',
-    iosClientId:'GOOGLE_GUID.apps.googleusercontent.com',
-    androidClientId: 'GOOGLE_GUID.apps.googleusercontent.com',
-    webClientId: '639060091344-pnqrb3tqatejq0qermb1836f7hoi1lrp.apps.googleusercontent.com',
+    expoClientId: process.env.EXPO_GOOGLE_CLIENT_ID,
+    iosClientId: process.env.IOS_GOOGLE_CLIENT_ID,
+    androidClientId: process.env.ANDROID_GOOGLE_CLIENT_ID,
+    webClientId: process.env.WEB_CLIENT_ID,
   });
 
   useEffect(()=>{
