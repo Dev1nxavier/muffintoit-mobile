@@ -51,22 +51,10 @@ function RootNavigator() {
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
       <Stack.Screen name="Products" component={ProductsScreen} options={
         ({route, navigation})=>({
-          title: route?.params?.name})}/>
+          title: route?.params?.name,
+          contentStyle:{backgroundColor:'#3f2f25'}})}/>
       <Stack.Screen name='Categories' component={CategoriesScreen}/>
-      <Stack.Screen name="Details" component={ProductDetailsScreen} options={
-        ({route, navigation})=>({
-          headerRight:()=>(<Pressable
-          onPress={()=>console.log("update with add to cart function")}
-          style={({pressed})=>({
-            opacity: pressed? 0.5: 1,
-          })}>
-            <FontAwesome
-                name="cart-plus"
-                size={25}
-                color={'white'}
-                style={{ marginRight: 15 }}
-              />
-          </Pressable>)})}/>
+      <Stack.Screen name="Details" component={ProductDetailsScreen} options={({route})=>({title: route.params.title})} />
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
         <Stack.Screen name="Modal" component={ModalScreen} />
       </Stack.Group>
@@ -90,6 +78,7 @@ function BottomTabNavigator() {
         tabBarActiveTintColor: Colors[colorScheme].tint,
         headerStyle: {backgroundColor: '#351401'},
         headerTintColor:'white',
+      
       }}>
       
       <BottomTab.Screen

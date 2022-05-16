@@ -2,41 +2,16 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 import { Text, View } from "../components/Themed";
 import { Image, FlatList } from "react-native";
 import { RootTabScreenProps } from "../types";
-import cookies from '../assets/images/ice-cream_nobg.png';
-import icecreambar from '../assets/images/icecreamcones_nobg.png';
-import icecream from '../assets/images/icecreambar_nobg.png';
-import cones from '../assets/images/icecreamcones_nobg.png';
 import { useState } from "react";
+import { useSelector, useDispatch } from 'react-redux';
+import { removeProduct } from "../store/redux/cartSlice"; 
+import { PRODUCTS } from "../data/store-data";
 
-const CART_ITEMS =[
-    {
-        imageUri: Image.resolveAssetSource(cookies).uri,
-        title: 'Cookies',
-        price: 100,
-        quantity: 2,
-    },
-    {
-        imageUri: Image.resolveAssetSource(icecreambar).uri,
-        title: 'Ice cream bars',
-        price: 100,
-        quantity: 2,
-    },
-    {
-        imageUri: Image.resolveAssetSource(icecream).uri,
-        title: 'Ice cream sunday',
-        price: 100,
-        quantity: 2,
-    },
-    {
-        imageUri: Image.resolveAssetSource(cones).uri,
-        title: 'Ice cream cones',
-        price: 100,
-        quantity: 2,
-    },
-]
+
 
 const CartItem = ({item, onPress})=>{
-    
+
+
     return(
         <TouchableOpacity onPress={onPress}>
         <View
@@ -46,7 +21,7 @@ const CartItem = ({item, onPress})=>{
             alignItems:'center',
             justifyContent:'space-between',
         }}>
-            <Image source={{uri: item.imageUri }} style={{width:50, height: 50}}/>
+            <Image source={item.imageUri} style={{width:50, height: 50}}/>
             <Text style={{marginLeft:10}}>{item.title}</Text>
             <Text style={{fontWeight:'bold', marginLeft:10}}>${item.price}</Text>
         </View>
@@ -57,6 +32,14 @@ const CartItem = ({item, onPress})=>{
 export default function CartScreen({ navigation }: RootTabScreenProps<'Cart'>) {
 
     const [selectedId, setSelectedId] = useState(null);
+
+    const dispatch = useDispatch();
+
+    const CART_ITEMS = useSelector((state)=>state.cartState.products);
+
+    //return cart items from data-store matching cart state
+    const CART_ITEM_LIST = PRODUCTS.filter((item)=>CART_ITEMS.includes(item.id))
+    
 
     const handlePress = (item)=>{
         alert(item.title);
@@ -72,7 +55,7 @@ export default function CartScreen({ navigation }: RootTabScreenProps<'Cart'>) {
             <Text style={styles.title}>My cart</Text>
             <FlatList
             style={{alignSelf:'stretch'}} 
-            data={CART_ITEMS}
+            data={CART_ITEM_LIST}
             renderItem={renderItem}
             keyExtractor={item=>item.title}/>
             <View>
