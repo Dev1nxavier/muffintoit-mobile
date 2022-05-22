@@ -8,8 +8,6 @@ import WebBrowser from 'expo-web-browser';
 
 export default function TabOneScreen({ navigation }: RootTabScreenProps<'GoogleLogin'>) {
 
-  console.log("client:", process.env.EXPO_GOOGLE_CLIENT_ID);
-
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId: process.env.EXPO_GOOGLE_CLIENT_ID,
     iosClientId: process.env.IOS_GOOGLE_CLIENT_ID,

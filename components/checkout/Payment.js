@@ -1,12 +1,11 @@
-import { StatusBar } from 'expo-status-bar';
 import { Button, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, TouchableWithoutFeedback } from 'react-native';
-import InputField from '../components/Input';
-import { Text, View } from '../components/Themed';
+import InputField from '../../components/Input';
+import { Text, View } from '../../components/Themed';
 import { useForm, Controller, } from 'react-hook-form'
-import { updateUser } from '../store/redux/userSlice';
+import { updateUser } from '../../store/redux/userSlice';
 import { useDispatch } from 'react-redux';
 
-export default function ModalScreen({ navigation, route }: any) {
+export default function Payments({handleStep}) {
 
   const { control, handleSubmit, reset, formState: { errors }, setValue } = useForm({
     defaultValues: {
@@ -24,18 +23,16 @@ export default function ModalScreen({ navigation, route }: any) {
 
   const dispatch = useDispatch();
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data) => {
     console.log(data);
     dispatch(updateUser({ ...data }))
+    handleStep();
   }
 
 
   return (
-
-    <View style={styles.container}>
-      <Text style={styles.title}>Checkout</Text>
-      <TouchableWithoutFeedback>
-        <View style={{ justifyContent: 'flex-end', flex: 1 }}>
+        <View >
+        <View>
           <Controller
             control={control}
             rules={{
@@ -52,7 +49,7 @@ export default function ModalScreen({ navigation, route }: any) {
                 style={{}} />
             )}
             name='firstName' />
-          {errors.firstName && alert("Please enter a first name")}
+         
 
           <Controller
             control={control}
@@ -70,7 +67,7 @@ export default function ModalScreen({ navigation, route }: any) {
                 style={{}} />
             )}
             name='lastName' />
-          {errors.lastName && alert("Please enter a last name")}
+          
             <Controller
               name='street'
               rules={{
@@ -152,7 +149,7 @@ export default function ModalScreen({ navigation, route }: any) {
               <Controller
                 control={control}
                 rules={{
-                  required: true
+  
                 }}
                 render={({ field: { onBlur, value, onChange } }) => (
                   <InputField
@@ -168,9 +165,7 @@ export default function ModalScreen({ navigation, route }: any) {
                   />
                 )}
                 name='creditCard' />
-              {errors.creditCard && alert("Please enter Credit Card Number")}
-
-
+              
               <Controller
                 control={control}
                 rules={{
@@ -190,27 +185,8 @@ export default function ModalScreen({ navigation, route }: any) {
               {errors.cid && <Text>This is required.</Text>}
 
             </View>
-            <Controller
-              name='comments'
-              control={control}
-              render={({ field: { onBlur, onChange, value } }) => (
-                <InputField label="Special instructions" textInputConfig={{
-                  multiline: true,
-                  autoCapitalize: 'sentences',
-                  maxLength: 100,
-                  onTextChange: onChange,
-                  onBlur: onBlur,
-                  value: value,
-                }}
-                  style={{}} />
-              )} />
         </View>
-      </TouchableWithoutFeedback>
-      <Button title='Submit' onPress={handleSubmit(onSubmit)} />
-      <Button title='Cancel' onPress={() => navigation.goBack()} />
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-      {/* <View style={{ flex: 1 }} /> */}
+      <Button title='Next' onPress={handleSubmit(onSubmit)} />
     </View >
 
   );

@@ -8,9 +8,9 @@ import { useEffect } from 'react';
 export default function TabTwoScreen() {
 
   const [request, response, promptAsync] = Facebook.useAuthRequest({
-    expoClientId: '415066556812293',
-    webClientId: '415066556812293',
-    clientId: '415066556812293',
+    expoClientId:process.env.EXPO_FB_CLIENT_ID,
+    webClientId: process.env.FB_WEB_CLIENT_ID ,
+    clientId: process.env.FB_CLIENT_ID ,
   })
 
   useEffect(() => {

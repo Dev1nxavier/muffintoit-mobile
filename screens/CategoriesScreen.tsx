@@ -3,13 +3,12 @@ import { Button, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-nat
 import { Text, View, } from '../components/Themed';
 import { useState } from 'react';
 import { CATEGORIES } from '../data/store-data';
-import { LinearGradient } from 'expo-linear-gradient';
 import CategoriesGridTile from '../components/CategoriesGridTile';
 
-const CategoriesScreen = ({ navigation, route }) => {
+const CategoriesScreen = ({ navigation, route }:any) => {
     const [selectedItem, setSelectedItem] = useState(null);
 
-    const renderItem = ({ item }) => {
+    const renderItem = ({ item }: any) => {
 
         const handlePress = () => {
             navigation.navigate('Products',{
@@ -23,6 +22,7 @@ const CategoriesScreen = ({ navigation, route }) => {
                 title={item.title}
                 id={item.id}
                 color={item.color}
+                image={item.image}
                 onPress={handlePress} />
         )
     }

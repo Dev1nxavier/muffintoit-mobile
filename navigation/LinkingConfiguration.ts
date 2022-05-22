@@ -34,6 +34,11 @@ const linking: LinkingOptions<RootStackParamList> = {
             screens:{
               ProductDetailsScreen: 'four'
             }
+          },
+          Checkout:{
+            screens:{
+              CheckoutScreen: 'five'
+            }
           }
         },
       },

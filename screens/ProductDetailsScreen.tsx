@@ -1,11 +1,20 @@
-import React, { Component, useLayoutEffect, useState } from 'react'
+import React, { Component, Key, useLayoutEffect, useState } from 'react'
 import { Image, Pressable, StyleSheet, Text, View, Platform, Button } from 'react-native';
 import { PRODUCTS, CATEGORIES } from '../data/store-data';
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { addProduct, removeProduct } from '../store/redux/cartSlice';
 
-function ProductDetailsScreen({ route, navigation }) {
+function ProductDetailsScreen({ route, navigation } : any) {
+    type itemObj = {
+        id: string,
+    }
+
+    type stateObj = {
+        cartState: object,
+        products: any,
+    }
+    
 
     const productId = route.params.id;
     const [isAdded, setIsAdded] = useState(false);
@@ -17,18 +26,19 @@ function ProductDetailsScreen({ route, navigation }) {
     const dispatch = useDispatch();
 
     //retrieve products from store
-    const cartItems = useSelector((state) => state.cartState.products);
+    const cartItems = useSelector((state : stateObj) => state.cartState.products);
 
     //bool for isAddedToStore
-    const cartItemStatus = cartItems.includes(id);
+    // const cartItemStatus = cartItems.includes(id);
+    const cartItemStatus = cartItems.find((item:itemObj)=>item.id === id);
 
     const headerButtonPressHandler = async () => {
         
         if(cartItemStatus){
-            dispatch(removeProduct({id}));
+            dispatch(removeProduct({...productDetails}));
 
         }else{
-            dispatch(addProduct({id}));
+            dispatch(addProduct({...productDetails, qty: 1}));
             
         }
     }
@@ -43,7 +53,7 @@ function ProductDetailsScreen({ route, navigation }) {
                             opacity: pressed ? 0.5 : 1,
                         })}>
                         {!cartItemStatus ? <FontAwesome5 name= "cart-plus" size={24} color='white' /> :
-                        <FontAwesome name='remove' size={24} color='white'/>}
+                        <Text style={{fontSize:12, color:'white'}}>Remove</Text>}
                     </Pressable>
                 )
             }

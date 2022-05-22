@@ -20,6 +20,8 @@ export type RootStackParamList = {
   Products: undefined;
   Categories: undefined;
   Details: undefined;
+  Checkout: undefined;
+  OrderDetails:undefined;
 
 };
 
@@ -35,6 +37,8 @@ export type RootTabParamList = {
   Cart: undefined;
   Categories: undefined;
   Details: undefined;
+  Checkout: undefined;
+  OrderHistory: undefined;
 };
 
 export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<
