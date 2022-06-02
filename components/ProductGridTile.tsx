@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     gridItem: {
         backgroundColor: 'white',
         flex: 1,
-        margin: 16,
+        margin: 8,
         borderRadius: 8,
         elevation: 4,
         shadowColor: 'black',
@@ -61,7 +61,8 @@ const styles = StyleSheet.create({
     },
     Image: {
         width: '100%',
-        height: 200,
+        resizeMode:'cover',
+        aspectRatio:1,
     }
 })
 

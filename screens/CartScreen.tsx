@@ -21,8 +21,8 @@ const CartItem = ({ item }) => {
         let cart;
         if (item.qty > 1) {
             cart = await updateCartProduct(cartId, item.lineItemId, { quantity: item.qty - 1 })
-        }else{
-            cart = await updateCartProduct(cartId, item.lineItemId, {quantity:0})
+        } else {
+            cart = await updateCartProduct(cartId, item.lineItemId, { quantity: 0 })
         }
         handleUpdateCart(cart);
     }
@@ -34,31 +34,23 @@ const CartItem = ({ item }) => {
 
     return (
 
-        <View style={{
-            padding: 20,
-            alignItems: 'flex-start',
-            justifyContent: 'flex-start',
-        }}>
+        <View style={styles.cartItem_container}>
 
             <View
-                style={{
-                    flexDirection: "row",
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-
-                }}>
+                style={styles.cartItem_inner}>
                 <Pressable
-                    
+
                     style={({ pressed }) => ({
                         opacity: pressed ? 0.5 : 1,
+                        flex:1,
                     })}>
-                    <Image source={{ uri: `${item.imageUri}` }} style={{ width: 100, height: 100, borderRadius: 15 }} />
+                    <Image source={{ uri: `${item.imageUri}` }} style={styles.image} />
                 </Pressable>
-                <View style={{ height: 100, flex: 1, flexDirection: 'column', justifyContent: 'space-evenly' }}>
+                <View style={styles.textContainer}>
                     <Text style={[styles.title, { marginLeft: 10 }]}>{item.title}</Text>
                     <Text style={{ fontWeight: 'bold', fontSize: 20, marginLeft: 10 }}>${item.price}</Text>
                 </View>
-                <View style={{ flexDirection: 'row' }}>
+                <View style={styles.buttonsContainer}>
                     <Pressable key={"removeItem"} onPress={subtractProductHandler}>
                         <FontAwesome name="minus-circle" size={36} color='purple' />
                     </Pressable>
@@ -140,6 +132,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
 
+
     },
     title: {
         fontSize: 20,
@@ -151,6 +144,36 @@ const styles = StyleSheet.create({
         height: 1,
         width: '80%',
     },
+    cartItem_container: {
+        flex: 1,
+        padding: 20,
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
+     
+    },
+    cartItem_inner: {
+        flex: 1,
+        flexDirection: "row",
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+
+    },
+    image: {
+        flex: 2,
+        aspectRatio: 1,
+        borderRadius: 15
+    },
+    textContainer: {
+        flex: 2,
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems:'center',
+    },
+    buttonsContainer:{
+        flex:1,
+        flexDirection: 'row',
+        justifyContent:'center', 
+    }
 });
 
 export default CartScreen;

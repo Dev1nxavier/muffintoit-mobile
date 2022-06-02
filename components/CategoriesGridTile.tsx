@@ -6,7 +6,7 @@ const CategoriesGridTile = ({ id, title, color, onPress, image }) => {
 
     return (
         <View style={styles.gridItem}>
-            <TouchableOpacity style={[styles.pressable, { backgroundColor: color }]} onPress={onPress}>
+            <TouchableOpacity style={[styles.pressable, { backgroundColor: color, flex:1}]} onPress={onPress}>
                 <ImageBackground source={image} resizeMode='cover' style={styles.image}>
                     <View style={[styles.innerContainer, { overflow: 'hidden' }]}>
                         <Text style={[styles.title, { textAlign: 'center' }]}>{title}</Text>
@@ -14,8 +14,6 @@ const CategoriesGridTile = ({ id, title, color, onPress, image }) => {
                 </ImageBackground>
                 <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 </View>
-
-
             </TouchableOpacity>
         </View>
     )
@@ -26,7 +24,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         flex: 1,
         margin: 16,
-        height: 150,
         borderRadius: 8,
         elevation: 4,
         shadowColor: 'black',
@@ -54,7 +51,7 @@ const styles = StyleSheet.create({
     },
     image: {
         flex: 1,
-        justifyContent: "center"
+        aspectRatio: 1,
     },
 })
 

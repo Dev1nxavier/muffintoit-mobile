@@ -1,10 +1,9 @@
-import { Button, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
-import EditScreenInfo from '../components/EditScreenInfo';
-import { Text, View, } from '../components/Themed';
-import { useEffect, useState } from 'react';
-import { PRODUCTS } from '../data/store-data';
+import { StyleSheet, FlatList, } from 'react-native';
+import { View, } from '../components/Themed';
+import { useState } from 'react';
 import ProductGridTile from '../components/ProductGridTile';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import MyCarousel from '../components/ShopCarousel';
 
 
 
@@ -44,13 +43,17 @@ const ProductsScreen = ({ route, navigation }:any) => {
 
 
     return (
+        <>
         <View style={styles.productContainer}>
             <FlatList
                 data={productsList}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
-                extraData={selectedItem} />
+                extraData={selectedItem}
+                numColumns={2} />
         </View>
+        </>
+
     )
 
 }
@@ -58,11 +61,8 @@ const ProductsScreen = ({ route, navigation }:any) => {
 const styles = StyleSheet.create({
     productContainer: {
         flex: 1,
-        padding: 16,
+        padding: 8,
     },
-    image: {
-
-    }
 })
 
 export default ProductsScreen;

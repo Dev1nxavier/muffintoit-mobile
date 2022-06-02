@@ -1,11 +1,14 @@
-import React, { Component, useEffect } from 'react'
-import { Button, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
-import { Text, View, } from '../components/Themed';
+import React, { } from 'react'
+import { StyleSheet, FlatList, Dimensions  } from 'react-native';
+import { View, } from '../components/Themed';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setCategories } from '../store/redux/productsSlice';
-import { getCategories } from '../util/eCommerce'
 import CategoriesGridTile from '../components/CategoriesGridTile';
+
+
+const {width: windowWidth} = Dimensions.get('window');
+
+const ITEM_WIDTH = windowWidth;
 
 const CategoriesScreen = ({ navigation, route }: any) => {
     const [selectedItem, setSelectedItem] = useState(null);
@@ -36,13 +39,14 @@ const CategoriesScreen = ({ navigation, route }: any) => {
 
 
     return (
-        <View>
+        <View style={styles.productContainer}>
             <FlatList
                 data={CATEGORIES}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
                 extraData={selectedItem}
-                numColumns={2} />
+                numColumns={2}
+               />
         </View>
     )
 
@@ -50,11 +54,9 @@ const CategoriesScreen = ({ navigation, route }: any) => {
 
 const styles = StyleSheet.create({
     productContainer: {
-
+        width: ITEM_WIDTH,
     },
-    image: {
 
-    }
 })
 
 export default CategoriesScreen;

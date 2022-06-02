@@ -18,7 +18,13 @@ async function getProducts() {
 
         for (const product of products) {
 
+            //product category array
             const categoryArray = product.categories.map(catObj => catObj.id);
+
+            //product image array
+            const imageArray = product.assets.map(asset => {
+                if (asset.is_image === true) return asset.url;
+            })
 
             const item = {
                 id: product.id,
@@ -26,7 +32,11 @@ async function getProducts() {
                 price: product.price.raw,
                 imageUri: product.image.url,
                 categories: categoryArray,
-                description: product.description
+                description: product.description,
+                soldOut: product.is.sold_out,
+                relatedProducts: product.related_products,
+                productImages: imageArray,
+
             }
 
             productsArray.push(item);
@@ -189,6 +199,53 @@ async function addCartProduct(cartId, itemId) {
 
     } catch (error) {
         console.error("Error adding product:", error);
+    }
+}
+
+async function removeCartProduct(cartId, lineItemId) {
+    console.log("removing product: ", lineItemId, cartId);
+    try {
+        const response = await axios.delete(`${BASE_URL}/carts/${cartId}/items/${lineItemId}`, {
+            headers: {
+                "X-Authorization": `${process.env.COMMERCE_PUBLIC}`,
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+            }
+        })
+
+        const cart = response.data;
+
+        let productsArray = [];
+
+        // format productslist
+        for (const product of cart.cart.line_items) {
+
+            const item = {
+                lineItemId: product.id,
+                id: product.product_id,
+                title: product.name,
+                price: product.price.raw,
+                imageUri: product.image.url,
+                description: product.description,
+                qty: product.quantity,
+
+            }
+
+            productsArray.push(item);
+
+        }
+
+        const cartObject = {
+            uniqueItems: cart.cart.total_unique_items,
+            totalCount: cart.cart.total_items,
+            subtotal: cart.cart.subtotal.raw,
+            products: productsArray,
+        }
+
+        return cartObject;
+
+    } catch (error) {
+        console.error("Error updating cart:", error.response);
     }
 }
 
@@ -383,5 +440,5 @@ async function getCountries(tokenId) {
 }
 
 
-export { getProducts, getCategories, retrieveCart, addCartProduct, updateCartProduct, getCheckoutToken, checkout, shippingOptions, getStates, getCountries };
+export { getProducts, getCategories, retrieveCart, addCartProduct, updateCartProduct, getCheckoutToken, checkout, shippingOptions, getStates, getCountries, removeCartProduct };
 
