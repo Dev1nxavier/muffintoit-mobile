@@ -19,7 +19,7 @@ const CartItem = ({ item }) => {
                     justifyContent: 'flex-start',
 
                 }}>
-                <Image source={item.imageUri} style={{ width: 100, height: 100, borderRadius: 15 }} />
+                <Image source={{uri: `${item.imageUri}`}} style={{ width: 100, height: 100, borderRadius: 15 }} />
 
                 <View style={{ height: 100, flex: 1, flexDirection: 'column', justifyContent: 'space-evenly' }}>
                     <Text style={{ marginLeft: 10, fontFamily:'merienda-bold', fontWeight:'bold', fontSize: 20 }}>{item.title}</Text>
@@ -41,7 +41,8 @@ const OrderHistoryDetails = ({navigation, route})=>{
 
     //filter list on orderId
     const id = route.params.orderId
-    const selectOrder = ORDER_LIST.filter(item=>item.id===id)[0];
+
+    const selectOrder = ORDER_LIST.filter(item=>item.orderId===id)[0];
 
     const { subtotal, products, ...others  } = selectOrder;
 

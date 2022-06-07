@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
-import Colors from '../constants/Colors';
+import Colors from '../../constants/Colors';
 import PropTypes from 'prop-types';
 
 
@@ -18,6 +18,12 @@ const InputField = ({ label, textInputConfig, style, value})=>{
         value={value}
         />
     </View>)
+}
+
+const FormError = ({error, message})=>{
+    return(
+        <Text style={styles.errors}>{message}</Text>
+    )
 }
 
 const styles= StyleSheet.create({
@@ -41,7 +47,14 @@ const styles= StyleSheet.create({
     inputMultiline:{
         minHeight: 100,
         textAlignVertical: 'top',
+    },
+    errors:{
+        color: 'red',
+        fontSize: 10,
+        fontStyle:'italic',
+        alignSelf:'flex-start',
     }
 })
 
 export default InputField;
+export {FormError};

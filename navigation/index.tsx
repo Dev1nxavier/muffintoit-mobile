@@ -5,14 +5,13 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import { ColorSchemeName, Pressable } from 'react-native';
-
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
-import ModalScreen from '../screens/ModalScreen';
 import CheckoutScreen from '../screens/CheckoutScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
-import TabOneScreen from '../screens/TabOneScreen';
 import TabTwoScreen from '../screens/TabTwoScreen';
+import SignUp from '../screens/SignUp';
+import Signin from '../screens/SignIn';
 import ProductsScreen from '../screens/ProductsScreen';
 import CategoriesScreen from '../screens/CategoriesScreen';
 import OrderHistory from '../screens/OrderHistoryScreen';
@@ -21,41 +20,50 @@ import OrderHistoryDetails from '../screens/OrderHistoryDetailScreen';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import ProductDetailsScreen from '../screens/ProductDetailsScreen';
-import CustomHeader from '../components/CustomHeader';
+import { useSelector } from 'react-redux'
 import { setCart } from '../store/redux/cartSlice';
-import { retrieveCart } from '../util/eCommerce'
 import { useDispatch } from 'react-redux';
-import { setCategories } from '../store/redux/productsSlice';
-import { getCategories } from '../util/eCommerce';
-import { setProducts } from '../store/redux/productsSlice';
-import { getProducts } from '../util/eCommerce';
+import { setCategories, setProducts } from '../store/redux/productsSlice';
+import { getCategories, getProducts, retrieveCart } from '../util/eCommerce';
+import ThankYou from '../screens/ThankYouScreen';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
 
   const dispatch = useDispatch();
 
+  const cartId = useSelector(state=>state.cartState.cartId)
+
   React.useEffect(() => {
-    //fetch cart
-    async function fetchCart() {
-      const cart = await retrieveCart();
-      dispatch(setCart({...cart}));
-    }
+
     async function fetchCategories() {
       const categories = await getCategories();
       dispatch(setCategories(categories));
     }
 
     async function fetchProducts() {
-      const data= await getProducts();
+      const data = await getProducts();
       dispatch(setProducts(data));
     }
 
     fetchCategories();
-    fetchCart();
     fetchProducts();
 
 
   }, [])
+
+  React.useEffect(() => {
+
+    console.log("Firing up the cart!", cartId);
+    //fetch cart
+    async function fetchCart() {
+      const cart = await retrieveCart();
+      dispatch(setCart({ ...cart }));
+    }
+
+    fetchCart();
+
+
+  }, [cartId])
 
   return (
     <NavigationContainer
@@ -88,8 +96,11 @@ function RootNavigator() {
       <Stack.Screen name="Details" component={ProductDetailsScreen} options={({ route }) => ({ title: route.params?.title })} />
       <Stack.Screen name='OrderDetails' component={OrderHistoryDetails} />
       <Stack.Screen name='Checkout' component={CheckoutScreen} />
+      <Stack.Screen name='Signup' component={SignUp} />
+      <Stack.Screen name='Signin' component={Signin} />
+      <Stack.Screen name='ThankYou' component={ThankYou}/>
       <Stack.Group screenOptions={{ presentation: 'modal' }}>
-        <Stack.Screen name="Modal" component={ModalScreen} />
+        <Stack.Screen name="Modal" component={TabTwoScreen} />
       </Stack.Group>
     </Stack.Navigator>
   );
@@ -103,7 +114,9 @@ const BottomTab = createBottomTabNavigator<RootTabParamList>();
 
 function BottomTabNavigator() {
   const colorScheme = useColorScheme();
-  const isLoggedIn = true;
+  const authenticated = useSelector(state => state.userState.isAuthenticated);
+
+  console.log("authenicated? ", authenticated);
 
   return (
     <BottomTab.Navigator
@@ -147,12 +160,30 @@ function BottomTabNavigator() {
           ),
         })}
       />
-      {isLoggedIn ?
+      {!authenticated ? <BottomTab.Screen
+        name="Signup"
+        component={SignUp}
+        options={{
+          title: 'Sign in',
+          tabBarIcon: ({ color }) => <TabBarIcon name="meetup" color={color} />,
+        }}
+      /> :
         <BottomTab.Screen
           name="OrderHistory"
           component={OrderHistory}
           options={{
-            title: 'Order History',
+            title: 'Order history',
+            tabBarIcon: ({ color }) => <TabBarIcon name="history" color={color} />,
+          }}
+        />}
+
+
+      {/* {isLoggedIn ?
+        <BottomTab.Screen
+          name="OrderHistory"
+          component={OrderHistory}
+          options={{
+            title: 'Sign up',
             tabBarIcon: ({ color }) => <TabBarIcon name="history" color={color} />,
           }}
         /> :
@@ -178,7 +209,7 @@ function BottomTabNavigator() {
             ),
           })}
         />
-      }
+      } */}
 
     </BottomTab.Navigator>
   );

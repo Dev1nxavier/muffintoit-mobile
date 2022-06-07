@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { ScrollView, StyleSheet, Switch } from 'react-native';
-import InputField from '../../components/Input';
+import InputField from '../ui/Input';
 import { Text, View } from '../../components/Themed';
 import { useForm, Controller, } from 'react-hook-form'
 import { updateUser } from '../../store/redux/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { CardField, CardForm } from '@stripe/stripe-react-native';
-import CustomButton from '../CustomButton';
+import CustomButton from '../ui/CustomButton';
 
 export default function Payments({ handleStep, enterPayment }) {
 
   //retrieve shipping details
   const userObj = useSelector(state => state.orderState);
-  console.log("User Info:", userObj);
+
   const { control, handleSubmit, reset, formState: { errors }, setValue } = useForm({
     defaultValues: {
       firstname: '',
@@ -82,15 +82,14 @@ export default function Payments({ handleStep, enterPayment }) {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <InputField label="First name" textInputConfig={{
-              maxLength: 20,
+              onChangeText: onChange,
+              maxLength: 50,
               autoCapitalize: 'words',
               onBlur: onBlur,
-              onChangeText: onChange,
-              placeholder: "first name",
 
             }}
               value={value}
-              style={styles.rowInputField} />
+              style={{}} />
           )}
         />
 

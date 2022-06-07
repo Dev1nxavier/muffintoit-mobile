@@ -6,6 +6,7 @@ import {
   Dimensions,
   Image,
   Pressable,
+  ActivityIndicator
 } from 'react-native';
 import Carousel from 'react-native-anchor-carousel';
 import SimplePaginationDot from './SimplePaginationDots';
@@ -70,6 +71,7 @@ productImages.forEach((val,index)=>{
         onPress={() => {
           carouselRef.current.scrollToIndex(index);
         }}>
+        {loading && <ActivityIndicator size={'large'} color='purple' style={{zIndex:2, position:'absolute', left:ITEM_WIDTH/2, top:ITEM_WIDTH/2}}/>}
         <Image source={{uri: image}} style={[styles.image, {opacity:loading?0.5:1}]} />
       </Pressable>
     );

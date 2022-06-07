@@ -8,9 +8,9 @@ import Order from '../components/checkout/Order';
 import { useSelector } from 'react-redux';
 import { handlePaymentIntent } from '../util/Stripe';
 import { useConfirmPayment, useStripe } from '@stripe/stripe-react-native'
-import { checkout, getCheckoutToken, getCountries, shippingOptions } from '../util/eCommerce';
+import { checkout, getCheckoutToken, getCountries, saveOrderHistory, } from '../util/eCommerce';
 import { useDispatch } from 'react-redux'
-import { setCart } from '../store/redux/cartSlice';
+import { clearCart, setCart } from '../store/redux/cartSlice';
 
 
 const steps = [
@@ -19,15 +19,15 @@ const steps = [
   "payment",
 ];
 
-function stepContent(props: { activeStep: Number, handleStep: Function, setOrderId: Function, openPaymentSheet: Function, shippingMethods: any, checkoutToken:String, listCountries:Array<Object> }) {
-  const { activeStep, handleStep, setOrderId, openPaymentSheet, shippingMethods, checkoutToken, listCountries } = props;
+function stepContent(props: { activeStep: Number, handleStep: Function, setOrderId: Function, openPaymentSheet: Function, checkoutToken: String, listCountries: Array<Object> }) {
+  const { activeStep, handleStep, setOrderId, openPaymentSheet, checkoutToken, listCountries } = props;
 
   switch (activeStep) {
     case 0:
       return <Review handleStep={handleStep} setOrderId={setOrderId} />
 
     case 1:
-      return <Shipping handleStep={handleStep} shippingMethods={shippingMethods} checkoutToken={checkoutToken} listCountries={listCountries} />
+      return <Shipping handleStep={handleStep} checkoutToken={checkoutToken} listCountries={listCountries} />
 
     case 2:
       return <Payments handleStep={handleStep} enterPayment={openPaymentSheet} />
@@ -40,50 +40,20 @@ export default function CheckoutScreen({ navigation, route }: any) {
 
   const dispatch = useDispatch();
 
-  const userInfo = useSelector(state => state.userState);
-  const { products, cartId, checkout_token, live } = useSelector(state => state.cartState);
+  const { isAuthenticated, email, localId } = useSelector(state => state.userState);
+
+  const { cartId, checkout_token, live } = useSelector(state => state.cartState);
 
   const [activeStep, setActiveStep] = useState(0);
   const [orderId, setOrderId] = useState(null);
   const [paymentIntentId, setPaymentIntentId] = useState('');
   const [customerId, setCustomerId] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [shippingMethods, setShippingMethods] = useState([]);
   const [isPaid, setIsPaid] = useState(false);
   const shippingInfo = useSelector(state => state.orderState);
-  const [checkoutToken, setCheckoutToken]= useState('');
-  const [listCountries, setListCountries] = useState([]); 
+  const [checkoutToken, setCheckoutToken] = useState('');
+  const [listCountries, setListCountries] = useState([]);
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
-  useEffect(() => {
-
-    const initializePaymentSheet = async () => {
-      const { paymentIntent, ephemeralKey, customer }: any = await handlePaymentIntent();
-
-      if (paymentIntent) {
-        setPaymentIntentId(paymentIntent);
-      }
-      if (customer) {
-        setCustomerId(customer);
-      }
-
-      const { error, paymentOption } = await initPaymentSheet({
-        merchantDisplayName: "Muffin To It!",
-        customerId: customer,
-        customerEphemeralKeySecret: ephemeralKey,
-        paymentIntentClientSecret: paymentIntent,
-        allowsDelayedPaymentMethods: false,
-
-      });
-
-      if (!error) {
-        setIsLoading(true);
-      }
-    };
-
-    initializePaymentSheet();
-
-  }, [])
 
   useEffect(() => {
     //create checkout token
@@ -101,31 +71,69 @@ export default function CheckoutScreen({ navigation, route }: any) {
 
         //format as {id:String, label:String, value:String}
         let countryArr = [];
-        for(const key in countries){
-          countryArr.push({id:key, label:countries[key], value: key})
+        for (const key in countries) {
+          countryArr.push({ id: key, label: countries[key], value: key })
         }
+
         setListCountries(countryArr);
       }
-        
-    }
 
+    }
     generateCheckoutToken();
   }, [])
+
+
+  useEffect(() => {
+
+    const initializePaymentSheet = async () => {
+    
+      const { paymentIntent, ephemeralKey, customer }: any = await handlePaymentIntent([], live.total?.raw);
+
+      if (paymentIntent) {
+        setPaymentIntentId(paymentIntent);
+      }
+      if (customer) {
+        setCustomerId(customer);
+      }
+
+      const { error, paymentOption } = await initPaymentSheet({
+        merchantDisplayName: "Muffin To It!",
+        customerId: customer,
+        customerEphemeralKeySecret: ephemeralKey,
+        paymentIntentClientSecret: paymentIntent,
+        allowsDelayedPaymentMethods: false,
+
+      });
+
+    };
+
+      initializePaymentSheet();
+
+  }, [live]);
 
   const openPaymentSheet = async () => {
 
     const paymentSheet = await presentPaymentSheet();
 
     if (paymentSheet.error) {
-      Alert.alert(`Error code: ${error.code}`, error.message);
+      Alert.alert(`Error code: ${paymentSheet.error.code}`, paymentSheet.error.message);
     } else {
       //TODO: handle checkout  
       const confirmPayment = await checkout(checkout_token, shippingInfo, paymentIntentId, customerId, live);
 
       if (confirmPayment.status_payment) {
         setIsPaid(true);
+
+        //save order history
+        await saveOrderHistory(confirmPayment, localId)
+
+        //reset cart
+        dispatch(clearCart());
+        navigation.replace('ThankYou',{
+          orderId: confirmPayment.id
+        });
       }
-      Alert.alert('Success', 'Your order is confirmed!');
+
     }
   }
 
@@ -138,33 +146,18 @@ export default function CheckoutScreen({ navigation, route }: any) {
     setActiveStep(currentStep => (currentStep + 1));
   }
 
-  if (isPaid) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>{steps[activeStep]}</Text>
-        <View style={{ flex: 1 }}>
-          <View>
-            <Order orderId={orderId} />
-            <Button title='Shop some more!' onPress={() => navigation.navigate('Categories')} />
-          </View>
-        </View>
-      </View>
-    )
-
-  }
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.form}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-      <Text style={styles.title}>
-        {steps[activeStep]}
-      </Text>
-      {stepContent({ activeStep, handleStep, setOrderId, checkoutToken, openPaymentSheet, shippingMethods, listCountries})}
-      {activeStep !== 0 && <Button title='Back' onPress={() => handleBack()} />}
-      </View>
+          <Text style={styles.title}>
+            {steps[activeStep]}
+          </Text>
+          {stepContent({ activeStep, handleStep, setOrderId, checkoutToken, openPaymentSheet, listCountries })}
+          {activeStep !== 0 && <Button title='Back' onPress={() => handleBack()} />}
+        </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   )
@@ -181,7 +174,7 @@ const styles = StyleSheet.create({
 
   },
   title: {
-    marginVertical:8,
+    marginVertical: 8,
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',

@@ -2,12 +2,16 @@
 require('dotenv').config();
 const express = require('express');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const PORT = 3000;
+const nodemailer = require('nodemailer');
+const PORT = process.env.PORT || 3000;
 const stripePublishableKey = process.env.STRIPE_PUBLIC_KEY || '';
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY || '';
+// const stripeSecretKey = process.env.STRIPE_SECRET_KEY || '';
 const bodyParser = require('body-parser');
 
 const app = express();
+const router = express.Router();
+
+const usersRouter = require('./routes/usersRouter');
 
 // parse application/json
 app.use(bodyParser.json())
@@ -18,15 +22,16 @@ app.get('/',(req, res)=>{
 
 app.get('/config', (req, res)=>{
     const message={stripePublishableKey: stripePublishableKey }
-    console.log(message);
     res.send(JSON.stringify(message));
 })
 
 app.post('/create-payment-intent',async (req, res)=>{
+
+    console.log("/create-payment-intent: total:", req.body.amount);
     try {
         //check for payment method and currency
         if(req.body.paymentMethodType && req.body.currency){
-
+            const {currency, amount} = req.body;
             const customer = await stripe.customers.create();
 
             const ephemeralKey = await stripe.ephemeralKeys.create(
@@ -36,8 +41,8 @@ app.post('/create-payment-intent',async (req, res)=>{
             
 
             const paymentIntent = await stripe.paymentIntents.create({
-                amount: 100,
-                currency: 'usd',
+                amount: amount * 100,
+                currency: currency,
                 customer: customer.id,
                 automatic_payment_methods: {
                     enabled: true,
@@ -58,4 +63,8 @@ app.post('/create-payment-intent',async (req, res)=>{
     }
 })
 
+app.use('/users', usersRouter);
+
 app.listen(PORT, ()=>console.log("Im listening on port:", PORT));
+
+module.exports={router};

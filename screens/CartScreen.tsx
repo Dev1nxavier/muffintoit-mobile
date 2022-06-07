@@ -7,17 +7,22 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setCart } from "../store/redux/cartSlice";
 import { FontAwesome } from '@expo/vector-icons';
 import { updateCartProduct } from '../util/eCommerce'
+import LoadingOverlay from "../components/ui/LoadingOverlay";
 
 
 
 const CartItem = ({ item }) => {
     const cartId = useSelector(state => state.cartState.cartId)
-
+    const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
 
-    const handleUpdateCart = (cart: any) => dispatch(setCart({ ...cart }))
+    const handleUpdateCart = (cart: any) => {
+        dispatch(setCart({ ...cart }))
+        setLoading(false);
+    }
 
     const subtractProductHandler = async () => {
+        setLoading(true);
         let cart;
         if (item.qty > 1) {
             cart = await updateCartProduct(cartId, item.lineItemId, { quantity: item.qty - 1 })
@@ -28,6 +33,7 @@ const CartItem = ({ item }) => {
     }
 
     const addProductHandler = async () => {
+        setLoading(true);
         const cart = await updateCartProduct(cartId, item.lineItemId, { quantity: item.qty + 1 })
         handleUpdateCart(cart);
     }
@@ -35,7 +41,7 @@ const CartItem = ({ item }) => {
     return (
 
         <View style={styles.cartItem_container}>
-
+            {loading && <LoadingOverlay />}
             <View
                 style={styles.cartItem_inner}>
                 <Pressable
@@ -75,7 +81,7 @@ const CartScreen = ({ navigation }: RootTabScreenProps<'Cart'>) => {
     useEffect(() => {
 
         async function getCartState() {
-            //inside CartScreen->getCartState
+           
             setCartItems(CART_STATE);
 
         }
@@ -159,15 +165,17 @@ const styles = StyleSheet.create({
 
     },
     image: {
-        flex: 2,
+        flex: 1,
         aspectRatio: 1,
-        borderRadius: 15
+        borderRadius: 15,
+        margin:2,
     },
     textContainer: {
-        flex: 2,
+        flex: 1,
         flexDirection: 'column',
         justifyContent: 'center',
-        alignItems:'center',
+        alignItems:'flex-start',
+        padding: 4,
     },
     buttonsContainer:{
         flex:1,

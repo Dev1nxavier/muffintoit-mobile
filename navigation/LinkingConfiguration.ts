@@ -35,11 +35,26 @@ const linking: LinkingOptions<RootStackParamList> = {
               ProductDetailsScreen: 'four'
             }
           },
+          Signup:{
+            screens:{
+              Signup : 'five'
+            }
+          },
+          Signin:{
+            screens:{
+              Signin:'six'
+            }
+          },
           Checkout:{
             screens:{
-              CheckoutScreen: 'five'
+              CheckoutScreen: 'seven'
             }
-          }
+          },
+          ThankYou:{
+            screens:{
+              ThankYouScreen:'eight'
+            }
+          },
         },
       },
       Modal: 'modal',

@@ -22,7 +22,9 @@ export type RootStackParamList = {
   Details: undefined;
   Checkout: undefined;
   OrderDetails:undefined;
-
+  Signin:undefined;
+  Signup:undefined;
+  ThankYou: undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
@@ -39,6 +41,9 @@ export type RootTabParamList = {
   Details: undefined;
   Checkout: undefined;
   OrderHistory: undefined;
+  Signup:undefined;
+  Signin: undefined;
+  ThankYou: undefined;
 };
 
 export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<

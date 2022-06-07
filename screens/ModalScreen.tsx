@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { Button, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, TouchableWithoutFeedback } from 'react-native';
-import InputField from '../components/Input';
+import InputField from '../components/ui/Input';
 import { Text, View } from '../components/Themed';
 import { useForm, Controller, } from 'react-hook-form'
 import { updateUser } from '../store/redux/userSlice';

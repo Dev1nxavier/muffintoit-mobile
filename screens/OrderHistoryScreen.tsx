@@ -1,6 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateHistory } from '../store/redux/userSlice';
+import { retrieveOrders } from '../util/eCommerce';
 
 interface ListItem{
     order: {
@@ -12,6 +14,11 @@ interface ListItem{
 }
 
 const ListItem = ({ order, handlePress }:ListItem) => {
+    
+    const calDate = new Date(order.orderDate).toDateString();
+    console.log("ORderHistoryItem: order:", calDate);
+    
+
 
     return (
 
@@ -22,11 +29,12 @@ const ListItem = ({ order, handlePress }:ListItem) => {
             })}
             onPress={()=>handlePress(order)}
             >
-            <Text style={[styles.title, styles.date]}>Date: {order.date}</Text>
+            <Text style={[styles.title, styles.date]}>Date: {calDate}</Text>
             <View style={styles.innerContainer}>
                 
                 <Text style={styles.text}>Subtotal: ${order.subtotal}</Text>
-                <Text style={styles.text}>Order number: {order.id}</Text>
+                <Text style={styles.text}>Total: ${order.total}</Text>
+                <Text style={styles.text}>Order number: {order.orderId}</Text>
             </View>
             </Pressable>
         </View>
@@ -34,6 +42,10 @@ const ListItem = ({ order, handlePress }:ListItem) => {
 }
 
 export default function OrderHistory({ navigation, route }) {
+    const dispatch = useDispatch();
+    const localId = useSelector(state=>state.userState.localId);
+
+    const checkout_token = useSelector(state=>state.cartState.checkout_token);
 
     interface stateObject {
         userState: {
@@ -41,14 +53,26 @@ export default function OrderHistory({ navigation, route }) {
         }
     }
 
-    const handlePress =(order:{id:string,})=>{
+    useEffect(()=>{
+        async function getUserOrders(){
+            const orders = await retrieveOrders(localId);
+            dispatch(updateHistory([...orders]))
+        }
+
+        getUserOrders();
+
+    },[localId, checkout_token ])
+
+    const handlePress =(order:{orderId:string,})=>{
         navigation.navigate('OrderDetails',{
-            orderId: order.id,
+            orderId: order.orderId,
         })
 
     }
 
     const ORDERS = useSelector((state: stateObject) => state.userState.orderHistory);
+
+    console.log("OrderHistory: ORDERS:", ORDERS);
 
     if (!ORDERS || ORDERS.length < 1) {
         return <Text>Please login to see your orders</Text>
@@ -63,7 +87,7 @@ export default function OrderHistory({ navigation, route }) {
                 numColumns={1}
                 data={ORDERS}
                 renderItem={renderItem}
-                keyExtractor={item => item.id}
+                keyExtractor={item => item.orderId}
             />
         </View>
     )

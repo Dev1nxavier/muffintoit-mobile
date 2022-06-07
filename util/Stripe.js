@@ -1,8 +1,8 @@
 import axios from "axios";
 import {API_URL} from '../Config'
 
-async function handlePaymentIntent(products=[]){
-
+async function handlePaymentIntent(products=[], total=100){
+    console.log("Stripe: total:", total);
     console.log("Attempting to submit payment");
 
     try {
@@ -10,6 +10,7 @@ async function handlePaymentIntent(products=[]){
             products,
             paymentMethodType: 'card',
             currency: 'usd',
+            amount: total,
         },{
             headers:{
                 'Content-Type': "application/json",

@@ -1,11 +1,10 @@
 import React, { useLayoutEffect, useState } from 'react'
-import { Pressable, StyleSheet, Text, View, Platform, ActivityIndicator, Dimensions } from 'react-native';
+import { Pressable, StyleSheet, Text, View, Platform, Dimensions } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeProduct, setCart } from '../store/redux/cartSlice';
+import { setCart } from '../store/redux/cartSlice';
 import { addCartProduct, removeCartProduct } from '../util/eCommerce'
 import MyCarousel from '../components/ShopCarousel';
-import { string } from 'prop-types';
 
 const { height, width } = Dimensions.get('window')
 const SCREEN_WIDTH = width;
@@ -19,24 +18,24 @@ function ProductDetailsScreen({ route, navigation }: any) {
     }
 
     type stateObj = {
-        cartState:{
+        cartState: {
             cartId: String,
-            products:Array<any>
+            products: Array<any>
         },
-        productState:{
-            loadProducts:any
+        productState: {
+            loadProducts: any
         }
     }
 
 
     const productId = route.params.id;
 
-    const PRODUCTS = useSelector((state:stateObj) => state.productState.loadProducts);
+    const PRODUCTS = useSelector((state: stateObj) => state.productState.loadProducts);
 
     const cartId = useSelector((state: stateObj) => state.cartState.cartId)
     console.log("Current Cart State:", cartId);
 
-    const [productDetails] = PRODUCTS.filter((item:itemObj) => item.id === productId);
+    const [productDetails] = PRODUCTS.filter((item: itemObj) => item.id === productId);
     const [loading, setIsLoading] = useState(false);
     const [addedItem, setAddedItem] = useState({});
 
@@ -63,12 +62,12 @@ function ProductDetailsScreen({ route, navigation }: any) {
 
         if (cartItemStatus) {
             //retrieve line item id for matching product
-            const lineId = cartItems.find((item: itemObj)=>{
-                if(item.id === productId) return item;
+            const lineId = cartItems.find((item: itemObj) => {
+                if (item.id === productId) return item;
             })
 
-            console.log("Retrieved Line Item ID:",lineId.lineItemId);
-            
+            console.log("Retrieved Line Item ID:", lineId.lineItemId);
+
             // dispatch(removeProduct({ ...productDetails }));
             cart = await removeCartProduct(cartId, lineId.lineItemId)
 
@@ -103,9 +102,9 @@ function ProductDetailsScreen({ route, navigation }: any) {
         navigation.setOptions
     }, [navigation, productId, headerButtonPressHandler])
 
+
     return (
         <View style={styles.OuterContainer}>
-            <ActivityIndicator animating={loading} size='large' style={styles.indicator} color='#a83297' />
             <Pressable style={styles.pressable}>
                 <View style={styles.innerContainer}>
                     <MyCarousel productImages={productImages} loading={loading} />

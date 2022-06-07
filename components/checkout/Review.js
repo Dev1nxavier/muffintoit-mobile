@@ -1,34 +1,15 @@
-import { Button, Text, FlatList, StyleSheet, Image } from "react-native";
+import { Text, StyleSheet } from "react-native";
 import { View } from "../Themed";
-import { useSelector, useDispatch } from 'react-redux';
-import { updateHistory } from '../../store/redux/userSlice'
-import { clearCart } from '../../store/redux/cartSlice';
-import Order from "../../models/order";
-import CustomButton from "../CustomButton";
+import { useSelector } from 'react-redux';
+import CustomButton from "../ui/CustomButton";
 
-export default function Review({ handleStep, setOrderId}) {
+export default function Review({ handleStep}) {
 
     const CART_STATE = useSelector((state) => state.cartState);
 
-    const CART_STORE = CART_STATE.products;
-
     const subtotal = CART_STATE.subtotal;
 
-    const dispatch = useDispatch();
-
     const handleSubmit = () => {
-        //dispatch order to store
-        const orderId = (""+Math.random()).substring(2,8);
-        setOrderId(orderId);
-        const orderDate = new Date().toISOString().slice(0,10);
-        const order = new Order(
-            orderId,
-            orderDate,
-            CART_STORE,
-            subtotal,
-            subtotal);
-        
-        dispatch(updateHistory({...order}))
         handleStep()
 
         

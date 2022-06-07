@@ -15,6 +15,9 @@ const userSlice = createSlice({
         email: '',
         comments: '',
         orderHistory:[],
+        isAuthenticated: false,
+        sessionToken:'',
+        localId:'',
     },
     reducers:{
         updateUser:(state, action)=>{
@@ -23,11 +26,21 @@ const userSlice = createSlice({
         },
         updateHistory:(state, action)=>{
   
-            state.orderHistory.push(action.payload)
-        }
+            // state.orderHistory.push(action.payload)
+            state.orderHistory = action.payload;
+        },
+        login:(state, action)=>{
+            console.log("in userSlice. Payload:", action.payload);
+            return state = {...state, sessionToken: action.payload.sessionToken, isAuthenticated:true, email:action.payload.email, localId:action.payload.localId};
+        },
+        logout:(state, action)=>{
+            return state = {...state, sessionToken:null, isAuthenticated:false};
+        },
     }
 })
 
 export const updateUser = userSlice.actions.updateUser;
 export const updateHistory = userSlice.actions.updateHistory;
+export const logout = userSlice.actions.logout;
+export const login = userSlice.actions.login;
 export default userSlice.reducer;

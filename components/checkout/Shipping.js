@@ -1,5 +1,5 @@
 import { Button, StyleSheet, Text, Modal, Pressable, Alert, TextInput, ScrollView, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
-import InputField from '../../components/Input';
+import InputField from '../ui/Input';
 import { View } from '../../components/Themed';
 import { useForm, Controller, } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,7 +7,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { updateShipping } from '../../store/redux/orderSlice';
 import { getStates, shippingOptions } from '../../util/eCommerce';
 import CustomModal from '../MyCustomModal';
-import CustomButton from '../CustomButton';
+import CustomButton from '../ui/CustomButton';
 import { ErrorMessage } from '@hookform/error-message';
 
 const countries = [
@@ -42,16 +42,16 @@ export default function Shipping({ handleStep, checkoutToken, listCountries }) {
     const dispatch = useDispatch();
 
     const onSubmit = (data) => {
-        console.log("From form:", data)
+
         dispatch(updateShipping({ ...data }))
         handleStep();
     }
 
     useEffect(() => {
 
-        console.log("Setting:",selectState.value, country.value, selectShipping.value)
+        console.log("Setting:", selectState.value, country.value, selectShipping.value)
         setValue('shippingMethodId', selectShipping.value)
-        setValue('country', country.value )
+        setValue('country', country.value)
         setValue('state', selectState.value);
     }, [selectShipping, selectState, country])
 
@@ -79,23 +79,23 @@ export default function Shipping({ handleStep, checkoutToken, listCountries }) {
 
     }, [country])
 
-    useEffect(()=>{
-        async function getAvailableSubdivisions(){
-            if(!country || country === '') return;
+    useEffect(() => {
+        async function getAvailableSubdivisions() {
+            if (!country || country === '') return;
             const subdivisions = await getStates(checkoutToken, country.value)
-  
+
             //format as {label:String, value: String}
-            let StateArr=[];
-            for(const key in subdivisions){
-                StateArr.push({id:key, label:subdivisions[key], value:key})
+            let StateArr = [];
+            for (const key in subdivisions) {
+                StateArr.push({ id: key, label: subdivisions[key], value: key })
             }
-            
+
             setStates(StateArr);
         }
 
         getAvailableSubdivisions();
 
-    },[country])
+    }, [country])
 
 
     return (
@@ -108,7 +108,7 @@ export default function Shipping({ handleStep, checkoutToken, listCountries }) {
             {country !== '' && <View style={{ marginVertical: 8 }}>
                 <CustomModal text={{ buttonTitle: "Choose Subdivision", confirm: "Confirm" }} setSelectOption={setSelectState} radioButtonsData={states}
                     selectOption={selectState}
-                    />
+                />
             </View>}
 
             {selectState !== '' && <View style={{ marginVertical: 8 }}>
@@ -116,7 +116,7 @@ export default function Shipping({ handleStep, checkoutToken, listCountries }) {
                     selectOption={selectShipping}
                     isDisabled={isDisabled} />
             </View>}
-            
+
 
             {selectShipping !== '' &&
                 <>
@@ -137,12 +137,11 @@ export default function Shipping({ handleStep, checkoutToken, listCountries }) {
                             render={({ field: { onChange, onBlur, value } }) => (
                                 <InputField label="First name" textInputConfig={{
                                     onBlur: onBlur,
-                                    onChangeText: onChange,
                                     maxLength: 20,
                                     autoCapitalize: 'words',
-                                    value: value,
-
+                                    onChangeText:onChange,
                                 }}
+                                    value={value}
                                     style={styles.rowInputField} />
                             )}
                         />
@@ -163,7 +162,7 @@ export default function Shipping({ handleStep, checkoutToken, listCountries }) {
                                 }}
                                     style={styles.rowInputField} />
                             )}
-                           />
+                        />
                     </View>
                     <Controller
                         name='street'
@@ -203,7 +202,7 @@ export default function Shipping({ handleStep, checkoutToken, listCountries }) {
                                     style={styles.rowInputField} />
                             )
                             } />
-                            <Controller
+                        <Controller
                             name='postal'
                             rules={{
                                 required: "Zip/Postal Code is required"
@@ -226,7 +225,7 @@ export default function Shipping({ handleStep, checkoutToken, listCountries }) {
                     </View>
                     <View style={styles.inputRow}>
 
-                        
+
 
                     </View>
                     <CustomButton handlePress={handleSubmit(onSubmit)} title="Next" />

@@ -62,7 +62,7 @@ const cartSlice = createSlice({
             state.totalCount--;
             state.subtotal-=action.payload.price;
         },
-        clearCart: (state, action)=>{
+        clearCart: (state)=>{
             return {...state, ...initialState}
         },
         setCart:(state, action)=>{
