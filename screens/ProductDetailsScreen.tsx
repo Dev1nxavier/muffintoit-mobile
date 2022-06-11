@@ -37,7 +37,6 @@ function ProductDetailsScreen({ route, navigation }: any) {
 
     const [productDetails] = PRODUCTS.filter((item: itemObj) => item.id === productId);
     const [loading, setIsLoading] = useState(false);
-    const [addedItem, setAddedItem] = useState({});
 
     const { id, title, price, description, productImages } = productDetails;
 
@@ -78,7 +77,7 @@ function ProductDetailsScreen({ route, navigation }: any) {
         }
 
         setIsLoading(false);
-
+        
         dispatch(setCart({ ...cart }));
     }
 

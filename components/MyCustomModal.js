@@ -1,10 +1,13 @@
-
 import React, { useState, useEffect } from 'react'
-import { Modal, Pressable, Text, View, StyleSheet, ScrollView } from 'react-native';
+import { Modal, Pressable, Text, View, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import RadioGroup from 'react-native-radio-buttons-group';
 
+const { height, width } = Dimensions.get('window')
+const MODAL_WIDTH = width * 0.8;
+const MODAL_HEIGHT = height * 0.8;
+const CustomModal = ({ setSelectOption, text, radioButtonsData, isDisabled = false }) => {
 
-const CustomModal = ({ setSelectOption, text, radioButtonsData, selectOption, isDisabled = false }) => {
+
 
     const [modalVisible, setModalVisible] = useState(false);
     const [radioButtons, setRadioButtons] = useState(radioButtonsData)
@@ -17,14 +20,15 @@ const CustomModal = ({ setSelectOption, text, radioButtonsData, selectOption, is
         console.log("Option:", selection.label);
         setRadioButtons(radioButtonsArray);
         setSelectOption(selection);
+        setModalVisible(false);
     }
 
     useEffect(() => {
-      setRadioButtons(radioButtonsData)
+        setRadioButtons(radioButtonsData)
     }, [radioButtonsData])
-    
+
     return (
-        <View>
+        <View >
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -32,19 +36,21 @@ const CustomModal = ({ setSelectOption, text, radioButtonsData, selectOption, is
                 onRequestClose={() => {
                     setModalVisible(!modalVisible);
                 }}
+                
+
             >
                 <View style={styles.centeredView}>
-                    
+
                     <View style={styles.modalView}>
                         <Text style={styles.modalText}>{text.title}</Text>
-                        <ScrollView style={{maxHeight:300}}>
-                        <RadioGroup
-                            radioButtons={radioButtons}
-                            onPress={onPressRadioButton}
-                            containerStyle={{textAlign:'left', alignItems:'left'}}
-                        />
+                        <ScrollView style={{ maxHeight: 300 }}>
+                            <RadioGroup
+                                radioButtons={radioButtons}
+                                onPress={onPressRadioButton}
+                                containerStyle={{ textAlign: 'left', alignItems: 'left' }}
+                            />
                         </ScrollView>
-    
+
                         <Pressable
                             style={[styles.button, styles.buttonClose]}
                             onPress={() => setModalVisible(!modalVisible)}
@@ -52,11 +58,11 @@ const CustomModal = ({ setSelectOption, text, radioButtonsData, selectOption, is
                             <Text style={styles.textStyle}>{text.confirm}</Text>
                         </Pressable>
                     </View>
-                   
+
                 </View>
             </Modal>
             <Pressable
-                style={[styles.button, styles.buttonOpen, ]}
+                style={[styles.button, styles.buttonOpen,]}
                 onPress={() => setModalVisible(true)}
                 disabled={isDisabled}
             >
@@ -69,15 +75,15 @@ const CustomModal = ({ setSelectOption, text, radioButtonsData, selectOption, is
 const styles = StyleSheet.create({
     centeredView: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 16,
-        maxHeight:300,
+        alignSelf: 'center',
+        alignItems:'center',
+        justifyContent:'center',
+        marginTop: 40,
+        width: 300,
+        maxHeight: MODAL_HEIGHT
     },
     modalView: {
-        flex:1,
-        margin: 20,
-        backgroundColor: "white",
+        backgroundColor:'white',
         borderRadius: 20,
         padding: 35,
         alignItems: "center",
@@ -89,7 +95,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5,
-        
+
     },
     button: {
         borderRadius: 20,
@@ -108,7 +114,7 @@ const styles = StyleSheet.create({
         textAlign: "center"
     },
     modalText: {
-        marginBottom: 15,
+        marginBottom:15,
         textAlign: "center"
     }
 })

@@ -10,7 +10,7 @@ import LoadingOverlay from './ui/LoadingOverlay';
 
 export default function AuthContent({ isLogin, onAuthenticate }) {
 
-    const { control, handleSubmit, reset, formState: { errors }, setValue, getValues } = useForm({
+    const { control, handleSubmit, reset, formState: { errors }, getValues } = useForm({
         defaultValues: {
             firstname: '',
             lastname: '',
@@ -21,7 +21,7 @@ export default function AuthContent({ isLogin, onAuthenticate }) {
     })
 
     const navigation =useNavigation();
-    const customerId = useSelector(state => state.userState.customerid);
+
 
     const handleRegister = async (data) => {
 
@@ -30,17 +30,20 @@ export default function AuthContent({ isLogin, onAuthenticate }) {
     }
 
     const switchAuthModeHandler = ()=>{
-        isLogin ? 
-        navigation.navigate('Signin')
-        :
-        navigation.navigate('Signup');
+        console.log("firing swithAuthHandler:", isLogin);
+
+        if(isLogin){
+            navigation.navigate('Signup')
+        }else{
+            navigation.navigate('Signin')
+        }
     }
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>{isLogin ? "Sign up!" : "Sign in!"}</Text>
+            <Text style={styles.title}>{isLogin ? "Sign in!" : "Sign up!"}</Text>
            <View style={styles.innerContainer}>
-                {isLogin && <>
+                {!isLogin && <>
                 <View style={styles.inputRow}>
                         <Controller
                             name='firstname'
@@ -141,7 +144,7 @@ export default function AuthContent({ isLogin, onAuthenticate }) {
                 {errors?.password && <FormError error={errors.password} message={errors.password.message}/>}
 
 
-                {isLogin && <> 
+                {!isLogin && <> 
                  <View style={styles.inputRow}>
                     <Controller
                         name='confirmPassword'
@@ -172,7 +175,7 @@ export default function AuthContent({ isLogin, onAuthenticate }) {
                 }
             </View>
             <Button title='Register' onPress={handleSubmit(handleRegister)} />
-            <Button title={isLogin? "Sign in" : "Sign up"} onPress={switchAuthModeHandler}/>
+            <Button title={isLogin? "Sign up" : "Sign in"} onPress={switchAuthModeHandler}/>
         </View>
     )
 }

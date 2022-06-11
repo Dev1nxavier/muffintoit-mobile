@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateHistory } from '../store/redux/userSlice';
 import { retrieveOrders } from '../util/eCommerce';
 
-interface ListItem{
+interface ListItem {
     order: {
         date: Date,
         subtotal: string,
@@ -13,29 +13,29 @@ interface ListItem{
     handlePress: Function,
 }
 
-const ListItem = ({ order, handlePress }:ListItem) => {
-    
+const ListItem = ({ order, handlePress }: ListItem) => {
+
     const calDate = new Date(order.orderDate).toDateString();
     console.log("ORderHistoryItem: order:", calDate);
-    
+
 
 
     return (
 
         <View style={styles.itemContainer}>
             <Pressable
-            style={({pressed})=>({
-                opacity: pressed? 0.5:1,
-            })}
-            onPress={()=>handlePress(order)}
+                style={({ pressed }) => ({
+                    opacity: pressed ? 0.5 : 1,
+                })}
+                onPress={() => handlePress(order)}
             >
-            <Text style={[styles.title, styles.date]}>Date: {calDate}</Text>
-            <View style={styles.innerContainer}>
-                
-                <Text style={styles.text}>Subtotal: ${order.subtotal}</Text>
-                <Text style={styles.text}>Total: ${order.total}</Text>
-                <Text style={styles.text}>Order number: {order.orderId}</Text>
-            </View>
+                <Text style={[styles.title, styles.date]}>Date: {calDate}</Text>
+                <View style={styles.innerContainer}>
+
+                    <Text style={styles.text}>Subtotal: ${order.subtotal}</Text>
+                    <Text style={styles.text}>Total: ${order.total}</Text>
+                    <Text style={styles.text}>Order number: {order.orderId}</Text>
+                </View>
             </Pressable>
         </View>
     )
@@ -43,9 +43,9 @@ const ListItem = ({ order, handlePress }:ListItem) => {
 
 export default function OrderHistory({ navigation, route }) {
     const dispatch = useDispatch();
-    const localId = useSelector(state=>state.userState.localId);
+    const localId = useSelector(state => state.userState.localId);
 
-    const checkout_token = useSelector(state=>state.cartState.checkout_token);
+    const checkout_token = useSelector(state => state.cartState.checkout_token);
 
     interface stateObject {
         userState: {
@@ -53,36 +53,47 @@ export default function OrderHistory({ navigation, route }) {
         }
     }
 
-    useEffect(()=>{
-        async function getUserOrders(){
-            const orders = await retrieveOrders(localId);
-            dispatch(updateHistory([...orders]))
+    useEffect(() => {
+        async function getUserOrders() {
+            
+            if(!isAuthenticated) return;
+
+            try {
+                console.log("Inside orderhistory with localId:", localId);
+                const orders = await retrieveOrders(localId);
+                dispatch(updateHistory([...orders]))
+            } catch (error) {
+                console.error("Unable to retrieve order history for user:", error);
+            }
+
         }
 
         getUserOrders();
 
-    },[localId, checkout_token ])
+    }, [localId, checkout_token])
 
-    const handlePress =(order:{orderId:string,})=>{
-        navigation.navigate('OrderDetails',{
+    const handlePress = (order: { orderId: string, }) => {
+        navigation.navigate('OrderDetails', {
             orderId: order.orderId,
         })
 
     }
 
-    const ORDERS = useSelector((state: stateObject) => state.userState.orderHistory);
+    const {orderHistory:ORDERS, isAuthenticated} = useSelector((state: stateObject) => state.userState);
 
     console.log("OrderHistory: ORDERS:", ORDERS);
 
     if (!ORDERS || ORDERS.length < 1) {
-        return <Text>Please login to see your orders</Text>
+        return (
+            <View style={styles.container}>
+                <Text style={styles.title}>No orders found. Start Shopping!</Text>
+            </View>)
     }
 
-    const renderItem = ({ item }:{item:object}) => <ListItem order={item} handlePress={handlePress} />
+    const renderItem = ({ item }: { item: object }) => <ListItem order={item} handlePress={handlePress} />
 
     return (
-        <View>
-           
+        <View style={styles.container}>
             <FlatList
                 numColumns={1}
                 data={ORDERS}
@@ -94,7 +105,11 @@ export default function OrderHistory({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     itemContainer: {
         flex: 1,
         alignItems: 'stretch',
@@ -110,12 +125,12 @@ const styles = StyleSheet.create({
         width: '100%',
         maxWidth: 350,
     },
-    innerContainer:{
+    innerContainer: {
         margin: 16,
 
     },
-    text:{
-        fontSize:16,
+    text: {
+        fontSize: 16,
     },
     title: {
         fontSize: 20,
@@ -126,11 +141,11 @@ const styles = StyleSheet.create({
     list: {
         alignSelf: 'stretch',
     },
-    pageTitle:{
-        margin:24,
-        color:'#255994'
+    pageTitle: {
+        margin: 24,
+        color: '#255994'
     },
-    date:{
+    date: {
         margin: 16,
     }
 

@@ -1,12 +1,11 @@
 import axios from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BASE_URL, API_URL } from '../Config'
+// import { BASE_URL, API_URL } from '../Config'
+import { BASE_URL} from '../Config';
 import { sanitizeLineItems } from "../helper";
-import { Alert } from "react-native";
-import * as Linking from 'expo-linking';
-import { useDispatch } from "react-redux";
-import { login } from "../store/redux/userSlice";
 
+// const API_URL = process.env.SERVER_DOMAIN;
+const API_URL = process.env.LOCAL_DOMAIN;
 
 async function getProducts() {
     try {
@@ -447,12 +446,14 @@ async function getCountries(tokenId) {
 }
 
 const authenticateUser = async(mode, email, password)=>{
-    const response = await axios.post(`${API_URL}/users/authenticate`,{
+    const response = await axios.post(`${API_URL}users/authenticate`,{
         mode: mode,
         email:email,
         password:password,
     })
     console.log("eCommerce: Authenticate:", response.data);
+    await AsyncStorage.setItem('@sessionToken', response.data.idToken);
+    await AsyncStorage.setItem('@localId',response.data.localId);
     return response.data;
 }
 
@@ -493,13 +494,15 @@ async function saveOrderHistory(order, localId){
 
     console.log("Cart Object: ",cartObject);
 
-    return await axios.post(`${API_URL}/users/${localId}/order-history`,{
+    return await axios.post(`${API_URL}users/${localId}/order-history`,{
         order: cartObject,
     })
 }
 
 async function retrieveOrders(userId){
-    const response = await axios.get(`${API_URL}/users/order-history/${userId}`);
+    console.log("ecommerce. localId:", userId);
+    try {
+         const response = await axios.get(`${API_URL}users/order-history/${userId}`);
 
     //flatten order object
     let ORDERS = [];
@@ -509,7 +512,23 @@ async function retrieveOrders(userId){
 
     console.log("eCommerce: ORDERS:", ORDERS);
     return ORDERS;
+    } catch (error) {
+        console.error("Error retrieving history:", error);
+    }
+   
 }
 
-export { getProducts, getCategories, retrieveCart, addCartProduct, updateCartProduct, getCheckoutToken, checkout, shippingOptions, getStates, getCountries, removeCartProduct, loginUser,authenticateUser, createUser, saveOrderHistory, retrieveOrders };
+async function updateTokenShipping(ship_id, countryCode, tokenId){
+    console.log("eCommerce: updateTokenShipping:", ship_id, countryCode, tokenId);
+    try {
+        return await axios.get(`${API_URL}checkout/shipping/${tokenId}`,{
+            ship_id: ship_id,
+            country: countryCode
+        })
+    } catch (error) {
+        console.error("Error updating shipping:", error);
+    }
+}
+
+export { getProducts, getCategories, retrieveCart, addCartProduct, updateCartProduct, getCheckoutToken, checkout, shippingOptions, getStates, getCountries, removeCartProduct, loginUser,authenticateUser, createUser, saveOrderHistory, retrieveOrders, updateTokenShipping};
 

@@ -1,14 +1,14 @@
-import { Button, StyleSheet, Text, Modal, Pressable, Alert, TextInput, ScrollView, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
-import InputField from '../ui/Input';
+import { StyleSheet, ScrollView } from 'react-native';
+import InputField, { FormError } from '../ui/Input';
 import { View } from '../../components/Themed';
 import { useForm, Controller, } from 'react-hook-form'
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useCallback, useEffect, useState } from 'react';
 import { updateShipping } from '../../store/redux/orderSlice';
-import { getStates, shippingOptions } from '../../util/eCommerce';
+import { getStates, shippingOptions, updateTokenShipping, } from '../../util/eCommerce';
 import CustomModal from '../MyCustomModal';
 import CustomButton from '../ui/CustomButton';
-import { ErrorMessage } from '@hookform/error-message';
+
 
 const countries = [
     { id: "US", label: "United States", value: "US" },
@@ -53,6 +53,11 @@ export default function Shipping({ handleStep, checkoutToken, listCountries }) {
         setValue('shippingMethodId', selectShipping.value)
         setValue('country', country.value)
         setValue('state', selectState.value);
+
+        if(selectShipping && selectShipping.value!==''){
+            updateTokenShipping(selectShipping.value, country.value, checkoutToken);
+        }
+        
     }, [selectShipping, selectState, country])
 
     useEffect(() => {
@@ -97,140 +102,157 @@ export default function Shipping({ handleStep, checkoutToken, listCountries }) {
 
     }, [country])
 
-
+  
     return (
-        <ScrollView>
-            <View>
-                <CustomModal text={{ buttonTitle: "Select Country", confirm: "Confirm" }} setSelectOption={setSelectCountry} radioButtonsData={listCountries}
-                    selectOption={country} />
-            </View>
+        <View style={{ flex: 1 }}>
+            <ScrollView>
+                <View>
+                    <CustomModal text={{ buttonTitle: country ? country.value : "Choose Country", confirm: "Confirm" }} setSelectOption={setSelectCountry} radioButtonsData={listCountries}
+                        selectOption={country} />
+                </View>
 
-            {country !== '' && <View style={{ marginVertical: 8 }}>
-                <CustomModal text={{ buttonTitle: "Choose Subdivision", confirm: "Confirm" }} setSelectOption={setSelectState} radioButtonsData={states}
-                    selectOption={selectState}
-                />
-            </View>}
-
-            {selectState !== '' && <View style={{ marginVertical: 8 }}>
-                <CustomModal text={{ buttonTitle: "Choose shipping", confirm: "Confirm" }} setSelectOption={setSelectShipping} radioButtonsData={shippingMethods}
-                    selectOption={selectShipping}
-                    isDisabled={isDisabled} />
-            </View>}
-
-
-            {selectShipping !== '' &&
-                <>
-
-                    <InputField
-                        label="Shipping"
-                        value={selectShipping.label}
+                {country !== '' && <View style={{ marginVertical: 8 }}>
+                    <CustomModal text={{ buttonTitle: selectState ? selectState.label : "Choose Subdivision", confirm: "Confirm" }} setSelectOption={setSelectState} radioButtonsData={states}
+                        selectOption={selectState}
                     />
+                </View>}
 
-                    <View style={styles.inputRow}>
-                        <Controller
-                            name="firstname"
-                            control={control}
-                            rules={{
-                                required: "First Name is required",
+                {selectState !== '' && <View style={{ marginVertical: 8 }}>
+                    <CustomModal text={{ buttonTitle: selectShipping ? selectShipping.label : "Choose shipping", confirm: "Confirm" }} setSelectOption={setSelectShipping} radioButtonsData={shippingMethods}
+                        selectOption={selectShipping}
+                        isDisabled={isDisabled} />
+                </View>}
 
-                            }}
-                            render={({ field: { onChange, onBlur, value } }) => (
-                                <InputField label="First name" textInputConfig={{
-                                    onBlur: onBlur,
-                                    maxLength: 20,
-                                    autoCapitalize: 'words',
-                                    onChangeText:onChange,
-                                }}
-                                    value={value}
-                                    style={styles.rowInputField} />
-                            )}
+
+                {selectShipping !== '' &&
+                    <>
+
+                        <InputField
+                            label="Shipping"
+                            value={selectShipping.label}
                         />
 
-                        <Controller
-                            name='lastname'
-                            control={control}
-                            rules={{
-                                required: "Last Name is required"
-                            }}
-                            render={({ field: { onChange, onBlur, value } }) => (
-                                <InputField label="Last name" textInputConfig={{
-                                    onChangeText: onChange,
-                                    maxLength: 50,
-                                    autoCapitalize: 'words',
-                                    onBlur: onBlur,
-                                    value: value,
-                                }}
-                                    style={styles.rowInputField} />
-                            )}
-                        />
-                    </View>
-                    <Controller
-                        name='street'
-                        rules={{
-                            required: "Street Address required",
-                        }}
-                        control={control}
-                        render={({ field: { value, onBlur, onChange } }) => (
-                            <InputField
-                                label="Street"
-                                textInputConfig={{
-                                    maxLength: 50,
-                                    onChangeText: onChange,
-                                    onBlur: onBlur,
-                                    value: value,
-                                }}
-                                style={{}} />
-                        )} />
+                        <View style={styles.inputRow}>
+                            <View style={styles.form}>
+                                <Controller
+                                    name="firstname"
+                                    control={control}
+                                    rules={{
+                                        required: "First Name is required",
 
-                    <View style={styles.inputRow}>
-                        <Controller
-                            name='city'
-                            control={control}
-                            key={"city"}
-                            rules={{
-                                required: "City is required",
-                            }}
-                            render={({ field: { value, onBlur, onChange } }) => (
-                                <InputField
-                                    label="City"
-                                    textInputConfig={{
-                                        maxLength: 50,
-                                        onChangeText: onChange,
-                                        onBlur: onBlur,
-                                        value: value,
                                     }}
-                                    style={styles.rowInputField} />
-                            )
-                            } />
-                        <Controller
-                            name='postal'
-                            rules={{
-                                required: "Zip/Postal Code is required"
-                            }}
-                            control={control}
-                            render={({ field: { onBlur, onChange, value } }) => (
-                                <InputField
-                                    label="Postal"
-                                    textInputConfig={{
-                                        keyboardType: 'numeric',
-                                        maxLength: 5,
-                                        onChangeText: onChange,
-                                        onBlur: onBlur,
-                                        value: value,
+                                    render={({ field: { onChange, onBlur, value } }) => (
+                                        <InputField label="First name" textInputConfig={{
+                                            onBlur: onBlur,
+                                            maxLength: 20,
+                                            autoCapitalize: 'words',
+                                            onChangeText: onChange,
+                                        }}
+                                            value={value}
+                                            style={styles.rowInputField} />
+                                    )}
+                                />
+                                {errors?.firstname && <FormError error={errors.firstname} message={errors.firstname.message} />}
+                            </View>
+                            <View style={styles.form}>
+                                <Controller
+                                    name='lastname'
+                                    control={control}
+                                    rules={{
+                                        required: "Last Name is required"
                                     }}
-                                    style={styles.rowInputField} />
-                            )} />
+                                    render={({ field: { onChange, onBlur, value } }) => (
+                                        <InputField label="Last name" textInputConfig={{
+                                            onChangeText: onChange,
+                                            maxLength: 50,
+                                            autoCapitalize: 'words',
+                                            onBlur: onBlur,
+                                            value: value,
+                                        }}
+                                            style={styles.rowInputField} />
+                                    )}
+                                />
+                                {errors?.lastname && <FormError error={errors.lastname} message={errors.lastname.message} />}
+                            </View>
+                        </View>
+                        <View style={styles.form}>
+                            <Controller
+                                name='street'
+                                rules={{
+                                    required: "Street Address required",
+                                }}
+                                control={control}
+                                render={({ field: { value, onBlur, onChange } }) => (
+                                    <InputField
+                                        label="Street"
+                                        textInputConfig={{
+                                            maxLength: 50,
+                                            onChangeText: onChange,
+                                            onBlur: onBlur,
+                                            value: value,
+                                        }}
+                                        style={{}} />
+                                )} />
+                            {errors?.street && <FormError error={errors.street} message={errors.street.message} />}
+                        </View>
+
+                        <View style={styles.inputRow}>
+                            <View style={styles.form}>
+                                <Controller
+                                    name='city'
+                                    control={control}
+                                    key={"city"}
+                                    rules={{
+                                        required: "City is required",
+                                    }}
+                                    render={({ field: { value, onBlur, onChange } }) => (
+                                        <InputField
+                                            label="City"
+                                            textInputConfig={{
+                                                maxLength: 50,
+                                                onChangeText: onChange,
+                                                onBlur: onBlur,
+                                                value: value,
+                                            }}
+                                            style={styles.rowInputField} />
+                                    )
+                                    } />
+
+                                {errors?.city && <FormError error={errors.city} message={errors.city.message} />}
+                            </View>
+                            <View style={styles.form}>
+                                <View style={styles.form}>
+                                    <Controller
+                                        name='postal'
+                                        rules={{
+                                            required: "Zip/Postal Code is required"
+                                        }}
+                                        control={control}
+                                        render={({ field: { onBlur, onChange, value } }) => (
+                                            <InputField
+                                                label="Postal"
+                                                textInputConfig={{
+                                                    keyboardType: 'numeric',
+                                                    maxLength: 5,
+                                                    onChangeText: onChange,
+                                                    onBlur: onBlur,
+                                                    value: value,
+                                                }}
+                                                style={styles.rowInputField} />
+                                        )} />
+                                    {errors?.postal && <FormError error={errors.postal} message={errors.postal.message} />}
+                                </View>
+                            </View>
+                        </View>
+                        <View style={styles.inputRow}>
 
 
-                    </View>
-                    <View style={styles.inputRow}>
 
-
-
-                    </View>
-                    <CustomButton handlePress={handleSubmit(onSubmit)} title="Next" />
-                </>}
-        </ScrollView>
+                        </View>
+                        <CustomButton handlePress={handleSubmit(onSubmit)} title="Next" />
+                    </>}
+            </ScrollView>
+        </View>
 
     );
 }

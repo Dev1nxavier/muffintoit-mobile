@@ -1,5 +1,5 @@
 
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -9,8 +9,7 @@ import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
 import CheckoutScreen from '../screens/CheckoutScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
-import TabTwoScreen from '../screens/TabTwoScreen';
-import SignUp from '../screens/SignUp';
+import Signup from '../screens/SignUp';
 import Signin from '../screens/SignIn';
 import ProductsScreen from '../screens/ProductsScreen';
 import CategoriesScreen from '../screens/CategoriesScreen';
@@ -26,12 +25,14 @@ import { useDispatch } from 'react-redux';
 import { setCategories, setProducts } from '../store/redux/productsSlice';
 import { getCategories, getProducts, retrieveCart } from '../util/eCommerce';
 import ThankYou from '../screens/ThankYouScreen';
+import { logout, updateUser } from '../store/redux/userSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
 
   const dispatch = useDispatch();
 
-  const cartId = useSelector(state=>state.cartState.cartId)
+  const cartId = useSelector(state => state.cartState.cartId)
 
   React.useEffect(() => {
 
@@ -53,7 +54,6 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
 
   React.useEffect(() => {
 
-    console.log("Firing up the cart!", cartId);
     //fetch cart
     async function fetchCart() {
       const cart = await retrieveCart();
@@ -65,6 +65,24 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
 
   }, [cartId])
 
+  React.useEffect(() => {
+
+    async function autoLogin() {
+      //check for token
+      const sessionToken = await AsyncStorage.getItem('@sessionToken');
+      const localId = await AsyncStorage.getItem('@localId');
+
+      if (!!sessionToken && sessionToken !== '') {
+        const isAuthenticated = true;
+        dispatch(updateUser({ isAuthenticated: isAuthenticated, sessionToken: sessionToken, localId: localId}));
+      }
+    }
+
+    autoLogin();
+
+  }, [])
+
+
   return (
     <NavigationContainer
       linking={LinkingConfiguration}
@@ -74,17 +92,20 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
   );
 }
 
-/**
- root stack navigator for displaying modals on top of all other content.
- */
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
+
+  const {isAuthenticated, sessionToken, localId} = useSelector(state => state.userState);
+
+  console.log("Session token: ", sessionToken, "ID:", localId);
+
   return (
     <Stack.Navigator screenOptions={{
       headerStyle: { backgroundColor: '#351401' },
       headerTintColor: 'white',
-      contentStyle: { backgroundColor: '#3f2f25' }
+      contentStyle: { backgroundColor: '#3f2f25' },
+
     }}>
       <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
@@ -94,14 +115,11 @@ function RootNavigator() {
           contentStyle: { backgroundColor: '#3f2f25' }
         })} />
       <Stack.Screen name="Details" component={ProductDetailsScreen} options={({ route }) => ({ title: route.params?.title })} />
+      {!isAuthenticated && <Stack.Screen name='Signin' component={Signin} />}
+      {!isAuthenticated && <Stack.Screen name='Signup' component={Signup} />}
       <Stack.Screen name='OrderDetails' component={OrderHistoryDetails} />
       <Stack.Screen name='Checkout' component={CheckoutScreen} />
-      <Stack.Screen name='Signup' component={SignUp} />
-      <Stack.Screen name='Signin' component={Signin} />
-      <Stack.Screen name='ThankYou' component={ThankYou}/>
-      <Stack.Group screenOptions={{ presentation: 'modal' }}>
-        <Stack.Screen name="Modal" component={TabTwoScreen} />
-      </Stack.Group>
+      <Stack.Screen name='ThankYou' component={ThankYou} />
     </Stack.Navigator>
   );
 }
@@ -113,22 +131,49 @@ function RootNavigator() {
 const BottomTab = createBottomTabNavigator<RootTabParamList>();
 
 function BottomTabNavigator() {
-  const colorScheme = useColorScheme();
+
+  const dispatch = useDispatch();
   const authenticated = useSelector(state => state.userState.isAuthenticated);
 
+  const colorScheme = useColorScheme();
+
+  const handleLogout = () => {
+    //remove token from storage
+    AsyncStorage.removeItem('@sessionToken');
+
+    //update state
+    dispatch(logout(null));
+  }
   console.log("authenicated? ", authenticated);
 
   return (
     <BottomTab.Navigator
       initialRouteName="Categories"
-      screenOptions={{
+      screenOptions={({navigation})=>({
         tabBarActiveTintColor: Colors[colorScheme].tint,
         headerStyle: { backgroundColor: '#351401' },
         headerTintColor: 'white',
-        headerTitleStyle: { fontFamily: 'merienda-bold' }
+        headerTitleStyle: {
+          fontFamily: 'merienda-bold',
+        },
+        headerRight: () => (authenticated ? <Pressable
+          onPress={() => handleLogout()}
+          style={({ pressed }) => ({
+            opacity: pressed ? 0.5 : 1,
+          })}>
+          <TabBarIcon name={'sign-out'} color={'white'} />
+        </Pressable> :
+          <Pressable
+            onPress={() => (navigation.navigate('Signup'))}
+            style={({ pressed }) => ({
+              opacity: pressed ? 0.5 : 1,
+            })}>
+            <TabBarIcon name={'sign-in'} color={'white'} />
+          </Pressable>
+        )
 
-      }}>
-
+      })}>
+      
       <BottomTab.Screen
         name="Categories"
         component={CategoriesScreen}
@@ -144,30 +189,8 @@ function BottomTabNavigator() {
         options={({ navigation }: RootTabScreenProps<'Cart'>) => ({
           title: 'Cart',
           tabBarIcon: ({ color }) => <TabBarIcon name="shopping-basket" color={color} />,
-          headerRight: () => (
-            <Pressable
-              onPress={() => navigation.navigate('Modal')}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}>
-              <FontAwesome
-                name="user-secret"
-                size={25}
-                color={'white'}
-                style={{ marginRight: 15 }}
-              />
-            </Pressable>
-          ),
         })}
       />
-      {!authenticated ? <BottomTab.Screen
-        name="Signup"
-        component={SignUp}
-        options={{
-          title: 'Sign in',
-          tabBarIcon: ({ color }) => <TabBarIcon name="meetup" color={color} />,
-        }}
-      /> :
         <BottomTab.Screen
           name="OrderHistory"
           component={OrderHistory}
@@ -175,42 +198,7 @@ function BottomTabNavigator() {
             title: 'Order history',
             tabBarIcon: ({ color }) => <TabBarIcon name="history" color={color} />,
           }}
-        />}
-
-
-      {/* {isLoggedIn ?
-        <BottomTab.Screen
-          name="OrderHistory"
-          component={OrderHistory}
-          options={{
-            title: 'Sign up',
-            tabBarIcon: ({ color }) => <TabBarIcon name="history" color={color} />,
-          }}
-        /> :
-        <BottomTab.Screen
-          name="GoogleLogin"
-          component={TabOneScreen}
-          options={({ navigation }: RootTabScreenProps<'GoogleLogin'>) => ({
-            title: 'Login with Google',
-            tabBarIcon: ({ color }) => <TabBarIcon name="google" color={color} />,
-            headerRight: () => (
-              <Pressable
-                onPress={() => navigation.navigate('Modal')}
-                style={({ pressed }) => ({
-                  opacity: pressed ? 0.5 : 1,
-                })}>
-                <FontAwesome
-                  name="user-secret"
-                  size={25}
-                  color={'white'}
-                  style={{ marginRight: 15 }}
-                />
-              </Pressable>
-            ),
-          })}
         />
-      } */}
-
     </BottomTab.Navigator>
   );
 }
@@ -223,4 +211,11 @@ function TabBarIcon(props: {
   color: string;
 }) {
   return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
+}
+
+function TabBarIcon5(props: {
+  name: React.ComponentProps<typeof FontAwesome5>['name'];
+  color: string;
+}) {
+  return <FontAwesome5 size={30} style={{ marginBottom: -3, }} {...props} />;
 }

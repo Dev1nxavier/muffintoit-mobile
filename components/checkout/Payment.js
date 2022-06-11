@@ -5,7 +5,6 @@ import { Text, View } from '../../components/Themed';
 import { useForm, Controller, } from 'react-hook-form'
 import { updateUser } from '../../store/redux/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { CardField, CardForm } from '@stripe/stripe-react-native';
 import CustomButton from '../ui/CustomButton';
 
 export default function Payments({ handleStep, enterPayment }) {

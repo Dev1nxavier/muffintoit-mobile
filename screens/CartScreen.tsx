@@ -41,7 +41,7 @@ const CartItem = ({ item }) => {
     return (
 
         <View style={styles.cartItem_container}>
-            {loading && <LoadingOverlay />}
+            {loading && <LoadingOverlay message="Updating cart..."/>}
             <View
                 style={styles.cartItem_inner}>
                 <Pressable
@@ -108,9 +108,9 @@ const CartScreen = ({ navigation }: RootTabScreenProps<'Cart'>) => {
 
     if (CART_STORE.length < 1 || !CART_STORE.length) {
         return (
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={{ fontSize: 24, fontFamily: 'merienda' }}>
-                    No Items In Cart
+            <View style={styles.container}>
+                <Text  style={{ fontSize: 24, fontFamily: 'merienda', textAlign:'center'}}>
+                    No Items In Cart.{'\n'} Start Shopping!
                 </Text>
             </View>
         )

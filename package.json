@@ -2,6 +2,9 @@
   "name": "muffintoit-mobile",
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
+  "engines": {
+    "node": "18.1.x"
+  },
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",

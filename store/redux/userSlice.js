@@ -26,15 +26,14 @@ const userSlice = createSlice({
         },
         updateHistory:(state, action)=>{
   
-            // state.orderHistory.push(action.payload)
             state.orderHistory = action.payload;
         },
         login:(state, action)=>{
             console.log("in userSlice. Payload:", action.payload);
             return state = {...state, sessionToken: action.payload.sessionToken, isAuthenticated:true, email:action.payload.email, localId:action.payload.localId};
         },
-        logout:(state, action)=>{
-            return state = {...state, sessionToken:null, isAuthenticated:false};
+        logout:(state)=>{
+            return state = {...state, sessionToken:null, isAuthenticated:false, orderHistory:[]};
         },
     }
 })

@@ -5,7 +5,6 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const nodemailer = require('nodemailer');
 const PORT = process.env.PORT || 3000;
 const stripePublishableKey = process.env.STRIPE_PUBLIC_KEY || '';
-// const stripeSecretKey = process.env.STRIPE_SECRET_KEY || '';
 const bodyParser = require('body-parser');
 
 const app = express();

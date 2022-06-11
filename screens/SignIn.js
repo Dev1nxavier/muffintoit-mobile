@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Alert } from 'react-native';
+import { Alert, Button, Text } from 'react-native';
 import { useDispatch } from 'react-redux';
 import AuthContent from '../components/AuthContent';
 import LoadingOverlay from '../components/ui/LoadingOverlay';
-import { loginUser, retrieveOrders } from '../util/eCommerce';
-import { login, updateHistory } from '../store/redux/userSlice'
+import { login } from '../store/redux/userSlice'
+import { loginUser } from '../util/eCommerce';
 
 export default function Signin({navigation}) {
 
@@ -15,11 +15,11 @@ export default function Signin({navigation}) {
 
     setIsAuthenticating(true);
     try {
+      
       const {idToken, localId} = await loginUser(email, password);
-      console.log("SignInScreen: token:", idToken);
+      console.log("Signin: localId:", localId);
       dispatch(login({sessionToken: idToken, email:email, localId:localId}))
-   
-      navigation.navigate('OrderHistory');
+      
     } catch (error) {
       Alert.alert("Error logging in user. Please check email or try again later");
       setIsAuthenticating(false);
@@ -31,5 +31,9 @@ export default function Signin({navigation}) {
   if (isAuthenticating) {
     return <LoadingOverlay message="Logging in user..." />
   }
-  return <AuthContent onAuthenticate={handleSignin} />
+  return (<>
+  <Text>SIGN-IN SCREEN</Text>
+  <Button title='To Signup-->' onPress={()=>navigation.navigate('Signup')}/>
+  <AuthContent isLogin={true} onAuthenticate={handleSignin} />
+  </>)
 }

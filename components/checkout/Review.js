@@ -5,14 +5,10 @@ import CustomButton from "../ui/CustomButton";
 
 export default function Review({ handleStep}) {
 
-    const CART_STATE = useSelector((state) => state.cartState);
-
-    const subtotal = CART_STATE.subtotal;
+    const live = useSelector((state) => state.cartState.live);
 
     const handleSubmit = () => {
         handleStep()
-
-        
     }
 
     return (
@@ -22,7 +18,7 @@ export default function Review({ handleStep}) {
                     Item Subtotal:
                 </Text>
                 <Text style={styles.text}>
-                    ${subtotal}
+                    ${live.subtotal.raw}
                 </Text>
             </View>
 
@@ -31,7 +27,7 @@ export default function Review({ handleStep}) {
                     Shipping &amp; handling:
                 </Text>
                 <Text style={styles.text}>
-                    $0.00
+                    ${live.shipping.price.raw}
                 </Text>
             </View>
 
@@ -40,7 +36,7 @@ export default function Review({ handleStep}) {
                     Total before taxes:
                 </Text>
                 <Text style={styles.text}>
-                    ${subtotal}
+                    ${live.total.raw}
                 </Text>
             </View>
 
@@ -49,7 +45,7 @@ export default function Review({ handleStep}) {
                     Tax:
                 </Text>
                 <Text style={styles.text}>
-                    $0.00
+                    ${live.tax.amount.raw}
                 </Text>
             </View>
 
@@ -58,7 +54,7 @@ export default function Review({ handleStep}) {
                     Order total:
                 </Text>
                 <Text style={styles.title}>
-                    ${subtotal}
+                    ${live.total_with_tax.raw}
                 </Text>
             </View>
             <CustomButton title={"Enter Shipping"} handlePress={handleSubmit}/>
