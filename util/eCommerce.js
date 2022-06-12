@@ -521,10 +521,11 @@ async function retrieveOrders(userId){
 async function updateTokenShipping(ship_id, countryCode, tokenId){
     console.log("eCommerce: updateTokenShipping:", ship_id, countryCode, tokenId);
     try {
-        return await axios.get(`${API_URL}checkout/shipping/${tokenId}`,{
+        return await axios.post(`${API_URL}checkout/shipping/${tokenId}`,{
             ship_id: ship_id,
             country: countryCode
         })
+
     } catch (error) {
         console.error("Error updating shipping:", error);
     }

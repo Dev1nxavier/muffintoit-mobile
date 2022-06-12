@@ -8,6 +8,7 @@ import { updateShipping } from '../../store/redux/orderSlice';
 import { getStates, shippingOptions, updateTokenShipping, } from '../../util/eCommerce';
 import CustomModal from '../MyCustomModal';
 import CustomButton from '../ui/CustomButton';
+import { setCart } from '../../store/redux/cartSlice';
 
 
 const countries = [
@@ -54,10 +55,22 @@ export default function Shipping({ handleStep, checkoutToken, listCountries }) {
         setValue('country', country.value)
         setValue('state', selectState.value);
 
-        if(selectShipping && selectShipping.value!==''){
-            updateTokenShipping(selectShipping.value, country.value, checkoutToken);
+        async function updateShipping() {
+
+            const response = await updateTokenShipping(selectShipping.value, country.value, checkoutToken);
+            
+            if(response.status===200){
+                
+                dispatch(setCart({live: response.data.live}))
+            }
         }
-        
+
+        if (selectShipping && selectShipping.value !== '') {
+            updateShipping();
+            
+        }
+
+
     }, [selectShipping, selectState, country])
 
     useEffect(() => {
@@ -102,7 +115,7 @@ export default function Shipping({ handleStep, checkoutToken, listCountries }) {
 
     }, [country])
 
-  
+
     return (
         <View style={{ flex: 1 }}>
             <ScrollView>

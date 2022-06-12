@@ -15,8 +15,9 @@ import { clearCart, setCart } from '../store/redux/cartSlice';
 
 const steps = [
   "shipping",
-  "payment",
   "Review",
+  "payment",
+  
 ];
 
 function stepContent(props: { activeStep: Number, handleStep: Function, openPaymentSheet: Function, checkoutToken: String, listCountries: Array<Object> }) {
