@@ -32,8 +32,7 @@ function ProductDetailsScreen({ route, navigation }: any) {
 
     const PRODUCTS = useSelector((state: stateObj) => state.productState.loadProducts);
 
-    const cartId = useSelector((state: stateObj) => state.cartState.cartId)
-    console.log("Current Cart State:", cartId);
+    const {cartId, products:cartItems} = useSelector((state: stateObj) => state.cartState)
 
     const [productDetails] = PRODUCTS.filter((item: itemObj) => item.id === productId);
     const [loading, setIsLoading] = useState(false);
@@ -43,7 +42,7 @@ function ProductDetailsScreen({ route, navigation }: any) {
     const dispatch = useDispatch();
 
     //retrieve products from store
-    const cartItems = useSelector((state: stateObj) => state.cartState.products);
+    // const cartItems = useSelector((state: stateObj) => state.cartState.products);
 
     const cartItemStatus = cartItems.find((item: itemObj) => item.id === id);
 
@@ -67,18 +66,16 @@ function ProductDetailsScreen({ route, navigation }: any) {
 
             console.log("Retrieved Line Item ID:", lineId.lineItemId);
 
-            // dispatch(removeProduct({ ...productDetails }));
             cart = await removeCartProduct(cartId, lineId.lineItemId)
 
         } else {
 
-            //POST to CMS
+
             cart = await addCartProduct(cartId, productId)
         }
-
-        setIsLoading(false);
-        
         dispatch(setCart({ ...cart }));
+        setIsLoading(false);
+         
     }
 
     useLayoutEffect(() => {

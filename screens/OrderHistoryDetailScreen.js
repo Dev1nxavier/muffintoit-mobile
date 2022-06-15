@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 
 const CartItem = ({ item }) => {
 
-    console.log("Inside CartItem", item);
     return (
         <View style={{
             alignItems: 'flex-start',

@@ -26,7 +26,6 @@ app.get('/config', (req, res)=>{
 
 app.post('/create-payment-intent',async (req, res)=>{
 
-    console.log("/create-payment-intent: total:", req.body.amount);
     try {
         //check for payment method and currency
         if(req.body.paymentMethodType && req.body.currency){

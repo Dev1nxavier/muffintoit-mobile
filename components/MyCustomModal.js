@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useLayoutEffect } from 'react'
 import { Modal, Pressable, Text, View, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import RadioGroup from 'react-native-radio-buttons-group';
 
@@ -23,9 +23,12 @@ const CustomModal = ({ setSelectOption, text, radioButtonsData, isDisabled = fal
         setModalVisible(false);
     }
 
-    useEffect(() => {
-        setRadioButtons(radioButtonsData)
-    }, [radioButtonsData])
+    // useEffect(() => {
+    //     setRadioButtons(radioButtonsData)
+    // }, [radioButtonsData])
+    useLayoutEffect(()=>{
+        setRadioButtons(radioButtonsData);
+    },[radioButtonsData])
 
     return (
         <View >

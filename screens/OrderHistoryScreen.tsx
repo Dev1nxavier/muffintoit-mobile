@@ -1,8 +1,9 @@
-import React, { Component, useEffect } from 'react';
+import React, { Component, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateHistory } from '../store/redux/userSlice';
 import { retrieveOrders } from '../util/eCommerce';
+import LoadingOverlay from '../components/ui/LoadingOverlay'
 
 interface ListItem {
     order: {
@@ -16,9 +17,6 @@ interface ListItem {
 const ListItem = ({ order, handlePress }: ListItem) => {
 
     const calDate = new Date(order.orderDate).toDateString();
-    console.log("ORderHistoryItem: order:", calDate);
-
-
 
     return (
 
@@ -53,18 +51,23 @@ export default function OrderHistory({ navigation, route }) {
         }
     }
 
+    const [isLoading, setIsLoading] = useState(false);
+
     useEffect(() => {
         async function getUserOrders() {
             
             if(!isAuthenticated) return;
 
+            setIsLoading(true);
+            
             try {
-                console.log("Inside orderhistory with localId:", localId);
                 const orders = await retrieveOrders(localId);
                 dispatch(updateHistory([...orders]))
             } catch (error) {
                 console.error("Unable to retrieve order history for user:", error);
             }
+
+            setIsLoading(false);
 
         }
 
@@ -82,6 +85,12 @@ export default function OrderHistory({ navigation, route }) {
     const {orderHistory:ORDERS, isAuthenticated} = useSelector((state: stateObject) => state.userState);
 
     console.log("OrderHistory: ORDERS:", ORDERS);
+
+    if(isLoading){
+        return(
+            <LoadingOverlay message="Loading Order History..."/>
+        )
+    }
 
     if (!ORDERS || ORDERS.length < 1) {
         return (

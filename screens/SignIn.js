@@ -17,7 +17,7 @@ export default function Signin({navigation}) {
     try {
       
       const {idToken, localId} = await loginUser(email, password);
-      console.log("Signin: localId:", localId);
+
       dispatch(login({sessionToken: idToken, email:email, localId:localId}))
       
     } catch (error) {

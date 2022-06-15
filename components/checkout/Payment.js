@@ -7,7 +7,7 @@ import { updateUser } from '../../store/redux/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import CustomButton from '../ui/CustomButton';
 
-export default function Payments({ handleStep, enterPayment }) {
+export default function Payments({ handleStep }) {
 
   //retrieve shipping details
   const userObj = useSelector(state => state.orderState);
@@ -40,7 +40,6 @@ export default function Payments({ handleStep, enterPayment }) {
 
       Object.entries(userObj).forEach(([name, value]) => {
         setValue(name, value)
-        console.log(name, ":", value);
       })
     } else {
       Object.entries(userObj).forEach(([name, value]) => {
@@ -54,8 +53,8 @@ export default function Payments({ handleStep, enterPayment }) {
   const onSubmit = (data) => {
 
     dispatch(updateUser({ ...data }))
-    enterPayment();
-
+    // enterPayment();
+    handleStep();
   }
 
 

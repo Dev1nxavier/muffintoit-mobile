@@ -2,9 +2,8 @@
 import axios from "axios";
 //helper function for fetching key from server
 
-// import { API_URL } from './Config';
 const API_URL = process.env.SERVER_DOMAIN;
-// const API_URL = process.env.LOCAL_DOMAIN;
+
 export async function fetchPublickKey(){
     try {
         console.log("Fetching key...");

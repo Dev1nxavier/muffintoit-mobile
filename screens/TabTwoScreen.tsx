@@ -22,24 +22,10 @@ export default function TabTwoScreen() {
 
   const handleRegister = async (data) => {
 
-    console.log("New User Data: ", data);
-
     const register = await registerUser(data.email);
-    console.log('saving customerID:', register.data);
+
     dispatch(updateUser({ customerid: register.data.id }))
   }
-
-  // const handleLogin = async()=>{
-
-  //   const jwt = await loginUser();
-
-  //   console.log("Customer ID:", customerId, "token:", jwt);
-
-  //   const emailToken = await emailLoginToken("seangreenebrandeis@gmail.com");
-
-  //   console.log("Email token:", emailToken);
-
-  // }
 
   return (
     <View style={styles.container}>

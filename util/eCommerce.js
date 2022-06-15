@@ -5,9 +5,10 @@ import { BASE_URL} from '../Config';
 import { sanitizeLineItems } from "../helper";
 
 // const API_URL = process.env.SERVER_DOMAIN;
-const API_URL = process.env.LOCAL_DOMAIN;
+const API_URL = process.env.SERVER_DOMAIN;
 
 async function getProducts() {
+    console.log("eCommerce getProducts");
     try {
         //retrieve all products
         const response = await axios.get(`${BASE_URL}/products`, {
@@ -17,7 +18,7 @@ async function getProducts() {
         })
 
         const { data: products } = response.data;
-
+        console.log("retrieved products:", products);
         let productsArray = [];
 
         for (const product of products) {

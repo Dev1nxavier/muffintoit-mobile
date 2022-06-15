@@ -1,14 +1,96 @@
-import { Text, StyleSheet } from "react-native";
+import { useState, useEffect } from 'react';
+import { Text, StyleSheet, Alert } from "react-native";
 import { View } from "../Themed";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import CustomButton from "../ui/CustomButton";
+import { handlePaymentIntent } from "../../util/Stripe";
+import { checkout, saveOrderHistory } from '../../util/eCommerce';
+import { useStripe } from '@stripe/stripe-react-native'
+import { clearCart } from '../../store/redux/cartSlice';
 
-export default function Review({ handleStep}) {
+export default function Review() {
 
-    const live = useSelector((state) => state.cartState.live);
+    const dispatch = useDispatch();
+
+    const { live, checkout_token } = useSelector((state) => state.cartState);
+
+    const { localId, isAuthenticated } = useSelector(state => state.userState);
+
+    const shippingInfo = useSelector(state => state.orderState);
+
+    const { initPaymentSheet, presentPaymentSheet } = useStripe();
+
+    const [paymentIntentId, setPaymentIntentId] = useState('');
+    const [customerId, setCustomerId] = useState('');
+
+    useEffect(() => {
+
+        const initializePaymentSheet = async () => {
+
+            try {
+                const { paymentIntent, ephemeralKey, customer } = await handlePaymentIntent([], live.total?.raw);
+
+                if (paymentIntent) {
+                    setPaymentIntentId(paymentIntent);
+                }
+                if (customer) {
+                    setCustomerId(customer);
+                }
+
+                const { error, paymentOption } = await initPaymentSheet({
+                    merchantDisplayName: "Muffin To It!",
+                    customerId: customer,
+                    customerEphemeralKeySecret: ephemeralKey,
+                    paymentIntentClientSecret: paymentIntent,
+                    allowsDelayedPaymentMethods: false,
+
+                });
+            } catch (error) {
+                console.error("Error setting up payments:", error);
+            }
+
+
+        };
+
+        initializePaymentSheet();
+
+    }, [live]);
+
+    const openPaymentSheet = async () => {
+
+        const paymentSheet = await presentPaymentSheet();
+
+
+
+        if (paymentSheet.error) {
+            Alert.alert(`Error code: ${paymentSheet.error.code}`, paymentSheet.error.message);
+        } else {
+
+            const confirmPayment = await checkout(checkout_token, shippingInfo, paymentIntentId, customerId, live);
+
+            if (confirmPayment.status_payment) {
+
+                if (isAuthenticated) {
+                    //save order history
+                    await saveOrderHistory(confirmPayment, localId)
+                }
+                
+                //reset cart
+                dispatch(clearCart());
+                navigation.replace('ThankYou', {
+                    orderId: confirmPayment.id
+                });
+            }else{
+                Alert.alert("Error processing payment. Please contact customer service");
+            }
+
+        }
+    }
 
     const handleSubmit = () => {
-        handleStep()
+        
+        openPaymentSheet();
+
     }
 
     return (
@@ -57,7 +139,7 @@ export default function Review({ handleStep}) {
                     ${live.total_with_tax.raw}
                 </Text>
             </View>
-            <CustomButton title={"Enter Shipping"} handlePress={handleSubmit}/>
+            <CustomButton title={"Enter Credit Card"} handlePress={handleSubmit} />
 
         </View>
     )
@@ -75,7 +157,7 @@ const styles = StyleSheet.create({
     list: {
         alignSelf: 'stretch',
     },
-    text:{
+    text: {
         fontSize: 20
     },
     title: {
@@ -85,13 +167,13 @@ const styles = StyleSheet.create({
     },
     lineItemsContainer: {
         flexDirection: 'row',
-        alignItems:'space-evenly',
+        alignItems: 'space-evenly',
         justifyContent: 'space-between',
-        width:'100%',
+        width: '100%',
         marginVertical: 16,
     },
-    button:{
-        marginTop:24,
+    button: {
+        marginTop: 24,
     }
 
 })

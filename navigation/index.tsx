@@ -98,8 +98,6 @@ function RootNavigator() {
 
   const {isAuthenticated, sessionToken, localId} = useSelector(state => state.userState);
 
-  console.log("Session token: ", sessionToken, "ID:", localId);
-
   return (
     <Stack.Navigator screenOptions={{
       headerStyle: { backgroundColor: '#351401' },

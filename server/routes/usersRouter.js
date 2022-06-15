@@ -32,7 +32,6 @@ router.post('/authenticate', async (req, res) => {
             email: email
         })}
 
-        console.log("Google response:" ,googleResponse.data);
         return res.send(googleResponse.data)
 
     } catch (error) {
@@ -45,7 +44,6 @@ router.post('/authenticate', async (req, res) => {
 router.post(`/login`, async (req, res,) => {
 
     try {
-        console.log("Inside /login")
 
         const response = await axios.post(`${BASE_URL}/customers/${req.body.customerId}/issue-token`, {
 
@@ -57,7 +55,6 @@ router.post(`/login`, async (req, res,) => {
             },
         })
 
-        console.log("retrieved token:", response.data)
         res.send({ data: response.data });
 
 
@@ -69,7 +66,6 @@ router.post(`/login`, async (req, res,) => {
 
 router.get('/login/order-history/:cusomterId', async (req, res) => {
     try {
-        console.log('Inside /login/order-history/customerID')
         const jwt = req.body.jwt;
 
         const response = await axios.get(`customers/${req.params.customerId}/orders`, {}, {
@@ -85,7 +81,7 @@ router.get('/login/order-history/:cusomterId', async (req, res) => {
 })
 
 router.post('/email_login', async (req, res) => {
-    console.log("router: email login. email:", req.body.email);
+
 
     try {
         const emailLogin = await axios.post(`${BASE_URL}/customers/email-token`, {
@@ -127,7 +123,6 @@ router.post(`/:localId/order-history`, async (req, res) => {
 router.get(`/order-history/:localId`, async(req, res)=>{
 
     const localId = req.params.localId;
-    console.log("Inside router /order-history with local ID: ", localId);
 
     const response = await axios.get(`https://muffintoit-a5c0a-default-rtdb.firebaseio.com/users/${localId}/order.json`)
 
