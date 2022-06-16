@@ -7,10 +7,10 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "GOOGLE_API": "AIzaSyCL-3pWGcx8T8CbxsIjVoWZNUtjA1W03sw",
+        
         "COMMERCE_PUBLIC": "pk_test_40967becea9489f3c14015276f9a1a2ae1a02801f9eed",
         "STRIPE_PUBLIC_KEY": "pk_test_51L2zMHBq2mc8HxwlP94GDfXvLjl4kg2dpxXaujoayJYOj0mFOVKc1lcLtjM27dJv2p8SRulAalwqFaulO981Drlm00hGBmDVmC",
-        "STRIPE_SECRET_KEY": "sk_test_51L2zMHBq2mc8Hxwl0DpIqwKbp2e5ovQqpoqbmwHRlMPWBzx1yUvVE0s1dXbtQwqN2J0BkGGJFKGncklSRyNY84Ly00GbugiVng",
+       
         "BASE_URL": "https://api.chec.io/v1",
         "SERVER_DOMAIN": "https://fierce-peak-77461.herokuapp.com/"
       }
@@ -21,10 +21,10 @@
         "simulator": true
       },
       "env": {
-        "GOOGLE_API": "AIzaSyCL-3pWGcx8T8CbxsIjVoWZNUtjA1W03sw",
+       
         "COMMERCE_PUBLIC": "pk_test_40967becea9489f3c14015276f9a1a2ae1a02801f9eed",
         "STRIPE_PUBLIC_KEY": "pk_test_51L2zMHBq2mc8HxwlP94GDfXvLjl4kg2dpxXaujoayJYOj0mFOVKc1lcLtjM27dJv2p8SRulAalwqFaulO981Drlm00hGBmDVmC",
-        "STRIPE_SECRET_KEY": "sk_test_51L2zMHBq2mc8Hxwl0DpIqwKbp2e5ovQqpoqbmwHRlMPWBzx1yUvVE0s1dXbtQwqN2J0BkGGJFKGncklSRyNY84Ly00GbugiVng",
+
         "BASE_URL": "https://api.chec.io/v1",
         "SERVER_DOMAIN": "https://fierce-peak-77461.herokuapp.com/"
       }
