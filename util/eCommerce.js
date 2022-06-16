@@ -18,7 +18,7 @@ async function getProducts() {
         })
 
         const { data: products } = response.data;
-        console.log("retrieved products:", products);
+        
         let productsArray = [];
 
         for (const product of products) {

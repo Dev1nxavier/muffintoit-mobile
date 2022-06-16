@@ -7,6 +7,7 @@ import InputField, { FormError } from '../components/ui/Input';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
 import LoadingOverlay from './ui/LoadingOverlay';
+import CustomButton from './ui/CustomButton';
 
 export default function AuthContent({ isLogin, onAuthenticate }) {
 
@@ -24,13 +25,12 @@ export default function AuthContent({ isLogin, onAuthenticate }) {
 
 
     const handleRegister = async (data) => {
-
+        console.log("Clicked handleRegister button")
         //only called after react-hook-form validation
         onAuthenticate(data.email, data.password);
     }
 
     const switchAuthModeHandler = ()=>{
-        console.log("firing swithAuthHandler:", isLogin);
 
         if(isLogin){
             navigation.navigate('Signup')
@@ -174,8 +174,8 @@ export default function AuthContent({ isLogin, onAuthenticate }) {
                 </>
                 }
             </View>
-            <Button title='Register' onPress={handleSubmit(handleRegister)} />
-            <Button title={isLogin? "Sign up" : "Sign in"} onPress={switchAuthModeHandler}/>
+            <CustomButton title={isLogin? "Login":"Signup"} handlePress={handleSubmit(handleRegister)} />
+            <Button title={isLogin? "No account? Sign up here" : "Already registered? Sign in here"} onPress={switchAuthModeHandler}/>
         </View>
     )
 }

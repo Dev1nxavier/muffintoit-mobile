@@ -55,6 +55,11 @@ const linking: LinkingOptions<RootStackParamList> = {
               ThankYouScreen:'eight'
             }
           },
+          Firebase:{
+            screens:{
+              FirebaseSignInScreen: 'nine'
+            }
+          },
         },
       },
       Modal: 'modal',

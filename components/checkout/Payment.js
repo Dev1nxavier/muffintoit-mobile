@@ -215,7 +215,7 @@ export default function Payments({ handleStep }) {
 
 
       </View>
-      <CustomButton handlePress={handleSubmit(onSubmit)} title="Enter Payment Details" style={{ marginVertical: 24, marginHorizontal: 24, fontFamily: 'merienda' }} />
+      <CustomButton handlePress={handleSubmit(onSubmit)} title="Review Order" style={{ marginVertical: 24, marginHorizontal: 24, fontFamily: 'merienda' }} />
     </ScrollView >
 
   );

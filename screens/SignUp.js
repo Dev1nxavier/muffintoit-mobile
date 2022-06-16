@@ -37,11 +37,7 @@ const Signup = ({navigation}) => {
     }
 
     return (
-    <> 
-    <Text>SIGNUP SCREEN</Text>
-    <Button title='To signin-->' onPress={()=>navigation.navigate('Signin')}/>
-    <AuthContent isLogin={false} onAuthenticate={handleSignup}/>
-    </>)
+    <AuthContent isLogin={false} onAuthenticate={handleSignup}/>)
    
 }
 

@@ -3,6 +3,7 @@ import { Text, StyleSheet, Alert } from "react-native";
 import { View } from "../Themed";
 import { useDispatch, useSelector } from 'react-redux';
 import CustomButton from "../ui/CustomButton";
+import { useNavigation } from '@react-navigation/native';
 import { handlePaymentIntent } from "../../util/Stripe";
 import { checkout, saveOrderHistory } from '../../util/eCommerce';
 import { useStripe } from '@stripe/stripe-react-native'
@@ -15,13 +16,15 @@ export default function Review() {
     const { live, checkout_token } = useSelector((state) => state.cartState);
 
     const { localId, isAuthenticated } = useSelector(state => state.userState);
-
+    const navigation = useNavigation();
     const shippingInfo = useSelector(state => state.orderState);
 
     const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
     const [paymentIntentId, setPaymentIntentId] = useState('');
     const [customerId, setCustomerId] = useState('');
+    const [orderId, setOrderId] = useState('');
+    const [isCheckout, setIsCheckout] = useState(false);
 
     useEffect(() => {
 
@@ -74,12 +77,15 @@ export default function Review() {
                     //save order history
                     await saveOrderHistory(confirmPayment, localId)
                 }
-                
+
+                setOrderId(confirmPayment.id);
+                setIsCheckout(true);
                 //reset cart
                 dispatch(clearCart());
-                navigation.replace('ThankYou', {
-                    orderId: confirmPayment.id
+                navigation.replace('ThankYou',{
+                    orderId: orderId,
                 });
+            
             }else{
                 Alert.alert("Error processing payment. Please contact customer service");
             }
@@ -92,6 +98,21 @@ export default function Review() {
         openPaymentSheet();
 
     }
+    
+    if(isCheckout){
+        return (
+            <View style={styles.container}>
+              <Text style={styles.title}>Thank you for your Order!</Text>
+              <Text style={styles.text}>Your order number is: {orderId}</Text>
+              <View style={{ flex: 1 }}>
+                <View style={{marginTop: 24}}>
+                  <CustomButton title='Shop some more!' onPress={() => navigation.navigate('Root')} />
+                </View>
+              </View>
+            </View>
+          )
+    }
+    
 
     return (
         <View style={styles.container}>
@@ -100,7 +121,7 @@ export default function Review() {
                     Item Subtotal:
                 </Text>
                 <Text style={styles.text}>
-                    ${live.subtotal.raw}
+                    ${live.subtotal?.raw}
                 </Text>
             </View>
 
@@ -109,7 +130,7 @@ export default function Review() {
                     Shipping &amp; handling:
                 </Text>
                 <Text style={styles.text}>
-                    ${live.shipping.price.raw}
+                    ${live.shipping?.price?.raw}
                 </Text>
             </View>
 
@@ -118,7 +139,7 @@ export default function Review() {
                     Total before taxes:
                 </Text>
                 <Text style={styles.text}>
-                    ${live.total.raw}
+                    ${live.total?.raw}
                 </Text>
             </View>
 
@@ -127,7 +148,7 @@ export default function Review() {
                     Tax:
                 </Text>
                 <Text style={styles.text}>
-                    ${live.tax.amount.raw}
+                    ${live.tax.amount?.raw}
                 </Text>
             </View>
 
@@ -136,7 +157,7 @@ export default function Review() {
                     Order total:
                 </Text>
                 <Text style={styles.title}>
-                    ${live.total_with_tax.raw}
+                    ${live.total_with_tax?.raw}
                 </Text>
             </View>
             <CustomButton title={"Enter Credit Card"} handlePress={handleSubmit} />

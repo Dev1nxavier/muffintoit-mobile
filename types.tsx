@@ -25,6 +25,7 @@ export type RootStackParamList = {
   Signin:undefined;
   Signup:undefined;
   ThankYou: undefined;
+  FireBase: undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
@@ -44,6 +45,7 @@ export type RootTabParamList = {
   Signup:undefined;
   Signin: undefined;
   ThankYou: undefined;
+  Firebase: undefined;
 };
 
 export type RootTabScreenProps<Screen extends keyof RootTabParamList> = CompositeScreenProps<

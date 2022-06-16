@@ -31,9 +31,7 @@ export default function Signin({navigation}) {
   if (isAuthenticating) {
     return <LoadingOverlay message="Logging in user..." />
   }
-  return (<>
-  <Text>SIGN-IN SCREEN</Text>
-  <Button title='To Signup-->' onPress={()=>navigation.navigate('Signup')}/>
-  <AuthContent isLogin={true} onAuthenticate={handleSignin} />
-  </>)
+  return (
+
+  <AuthContent isLogin={true} onAuthenticate={handleSignin} />)
 }

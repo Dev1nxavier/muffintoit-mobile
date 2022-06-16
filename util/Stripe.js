@@ -3,7 +3,7 @@ import axios from "axios";
 const API_URL = process.env.SERVER_DOMAIN;
 
 async function handlePaymentIntent(products=[], total){
-
+    console.log("eCommerce: Inside handlePaymentIntent");
 
     try {
         const response = await axios.post(`${API_URL}create-payment-intent`,{
@@ -16,7 +16,7 @@ async function handlePaymentIntent(products=[], total){
                 'Content-Type': "application/json",
             }
         })
-
+        console.log("eCommerce: resolving payment intent");
         const {paymentIntent, ephemeralKey, customer} = await response.data;
 
         return({
