@@ -4,7 +4,6 @@ import * as Google from 'expo-auth-session/providers/google';
 import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
-import WebBrowser from 'expo-web-browser';
 
 export default function TabOneScreen({ navigation }: RootTabScreenProps<'GoogleLogin'>) {
 

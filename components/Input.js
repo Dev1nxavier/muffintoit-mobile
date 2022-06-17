@@ -4,7 +4,7 @@ import Colors from '../constants/Colors';
 import PropTypes from 'prop-types';
 
 
-const InputField = ({ label, textInputConfig, style})=>{
+const InputField = ({ label, textInputConfig, style, value})=>{
     const inputStyles = [styles.input];
 
     if(textInputConfig && textInputConfig.multiline){
@@ -13,7 +13,10 @@ const InputField = ({ label, textInputConfig, style})=>{
 
     return (<View style={[styles.outerContainer, style]}>
         <Text style={styles.label}>{label}</Text>
-        <TextInput style={inputStyles} {...textInputConfig}/>
+        <TextInput 
+        style={inputStyles} {...textInputConfig}
+        value={value}
+        />
     </View>)
 }
 
@@ -31,9 +34,9 @@ const styles= StyleSheet.create({
     input:{
         padding: 6,
         borderRadius: 6,
-        fontSize: 18,
-        backgroundColor: Colors.dark.background,
-        color: Colors.dark.text,
+        fontSize: 14,
+        borderBottomColor: Colors.dark.background,
+        borderBottomWidth:1,
     },
     inputMultiline:{
         minHeight: 100,

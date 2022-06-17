@@ -3,14 +3,16 @@ import { createSlice } from '@reduxjs/toolkit';
 const orderSlice = createSlice({
     name: 'order',
     initialState:{
-        firstName:'',
-        lastName: '',
+        firstname:'',
+        lastname: '',
+        street:'',
         city: '',
         state:'',
         postal:'',
+        country:'',
         comments:'',
         isGift: false,
-        cartId:null,
+        shippingMethodId:''
     },
     reducers:{
         udpateShipping:(state, action)=>{

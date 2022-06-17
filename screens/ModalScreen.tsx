@@ -25,7 +25,7 @@ export default function ModalScreen({ navigation, route }: any) {
   const dispatch = useDispatch();
 
   const onSubmit = (data: any) => {
-    console.log(data);
+
     dispatch(updateUser({ ...data }))
   }
 

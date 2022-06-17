@@ -1,198 +1,237 @@
-import { Button, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, TouchableWithoutFeedback } from 'react-native';
+import React, { useState, useEffect } from 'react'
+import { ScrollView, StyleSheet, Switch } from 'react-native';
 import InputField from '../../components/Input';
 import { Text, View } from '../../components/Themed';
 import { useForm, Controller, } from 'react-hook-form'
 import { updateUser } from '../../store/redux/userSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { CardField, CardForm } from '@stripe/stripe-react-native';
+import CustomButton from '../CustomButton';
 
-export default function Payments({handleStep}) {
+export default function Payments({ handleStep, enterPayment }) {
 
+  //retrieve shipping details
+  const userObj = useSelector(state => state.orderState);
+  console.log("User Info:", userObj);
   const { control, handleSubmit, reset, formState: { errors }, setValue } = useForm({
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      creditCard: '',
-      cid: '',
+      firstname: '',
+      lastname: '',
       street: '',
       city: '',
       state: '',
       postal: '',
-      comments: '',
+      country: '',
+
     }
   })
 
   const dispatch = useDispatch();
 
+  const [isEnabled, setIsEnabled] = useState(false);
+
+  const toggleSwitch = () => {
+    setIsEnabled(prevState => !prevState);
+
+  }
+
+  useEffect(() => {
+
+    if (isEnabled) {
+
+      Object.entries(userObj).forEach(([name, value]) => {
+        setValue(name, value)
+        console.log(name, ":", value);
+      })
+    } else {
+      Object.entries(userObj).forEach(([name, value]) => {
+        setValue(name, '');
+      })
+  }
+
+  }, [isEnabled]);
+
+
   const onSubmit = (data) => {
-    console.log(data);
+
     dispatch(updateUser({ ...data }))
-    handleStep();
+    enterPayment();
+
   }
 
 
   return (
-        <View >
-        <View>
+    <ScrollView style={{}}>
+      <View style={{ flexDirection: 'row', alignContent: 'center', justifyContent: 'center' }}>
+        <Text style={{ textAlign: 'center', alignSelf: 'center', marginRight: 20 }}>Same as shipping</Text>
+        <Switch
+          trackColor={{ false: "#767577", true: "#81b0ff" }}
+          thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+          ios_backgroundColor="#3e3e3e"
+          onValueChange={toggleSwitch}
+          value={isEnabled}
+        />
+      </View>
+      <View>
+        <Controller
+          name="firstname"
+          control={control}
+          rules={{
+            required: "First Name is required",
+
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <InputField label="First name" textInputConfig={{
+              maxLength: 20,
+              autoCapitalize: 'words',
+              onBlur: onBlur,
+              onChangeText: onChange,
+              placeholder: "first name",
+
+            }}
+              value={value}
+              style={styles.rowInputField} />
+          )}
+        />
+
+
+        <Controller
+          name='lastname'
+          control={control}
+          rules={{
+            required: true
+          }}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <InputField label="Last name" textInputConfig={{
+              onChangeText: onChange,
+              maxLength: 50,
+              autoCapitalize: 'words',
+              onBlur: onBlur,
+
+            }}
+              value={value}
+              style={{}} />
+          )}
+        />
+
+        <Controller
+          name='street'
+          rules={{
+            required: true,
+          }}
+          control={control}
+          render={({ field: { value, onBlur, onChange } }) => (
+            <InputField
+              label="Street"
+              textInputConfig={{
+                maxLength: 50,
+                onChangeText: onChange,
+                onBlur: onBlur,
+
+              }}
+              value={value}
+              style={{}} />
+          )} />
+
+        <View style={styles.inputRow}>
           <Controller
+            name='city'
             control={control}
+            key={"city"}
             rules={{
               required: true,
             }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <InputField label="First name" textInputConfig={{
-                onBlur: onBlur,
-                onChangeText: onChange,
-                maxLength: 20,
-                autoCapitalize: 'words',
-                value: value
-              }}
-                style={{}} />
-            )}
-            name='firstName' />
-         
+            render={({ field: { value, onBlur, onChange } }) => (
+              <InputField
+                label="City"
+                textInputConfig={{
+                  maxLength: 50,
+                  onChangeText: onChange,
+                  onBlur: onBlur,
 
+                }}
+                value={value}
+                style={styles.rowInputField} />
+            )
+            } />
           <Controller
+            name='state'
             control={control}
+            key={"state"}
+            rules={{
+              required: true,
+            }}
+            render={({ field: { value, onBlur, onChange } }) => (
+              <InputField
+                label="State"
+                textInputConfig={{
+                  maxLength: 50,
+                  onChangeText: onChange,
+                  onBlur: onBlur,
+
+                }}
+                value={value}
+                style={styles.rowInputField} />
+            )
+            } />
+        </View>
+
+        <View style={styles.inputRow}>
+          <Controller
+            name='postal'
             rules={{
               required: true
             }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <InputField label="Last name" textInputConfig={{
-                onChangeText: onChange,
-                maxLength: 50,
-                autoCapitalize: 'words',
-                onBlur: onBlur,
-                value: value,
-              }}
-                style={{}} />
-            )}
-            name='lastName' />
-          
-            <Controller
-              name='street'
-              rules={{
-                required: true,
-              }}
-              control={control}
-              render={({ field: { value, onBlur, onChange } }) => (
-                <InputField
-                  label="Street"
-                  textInputConfig={{
-                    maxLength: 50,
-                    onChangeText: onChange,
-                    onBlur: onBlur,
-                    value: value,
-                  }}
-                  style={{}} />
-              )} />
+            control={control}
+            render={({ field: { onBlur, onChange, value } }) => (
+              <InputField
+                label="Postal"
+                textInputConfig={{
+                  keyboardType: 'numeric',
+                  maxLength: 10,
+                  onChangeText: onChange,
+                  onBlur: onBlur,
 
-            <View style={styles.inputRow}>
-              <Controller
-                name='city'
-                control={control}
-                key={"city"}
-                rules={{
-                  required: true,
                 }}
-                render={({ field: { value, onBlur, onChange } }) => (
-                  <InputField
-                    label="City"
-                    textInputConfig={{
-                      maxLength: 50,
-                      onChangeText: onChange,
-                      onBlur: onBlur,
-                      value: value,
-                    }}
-                    style={styles.rowInputField} />
-                )
-                } />
-              <Controller
-                name='state'
-                control={control}
-                key={"state"}
-                rules={{
-                  required: true,
-                }}
-                render={({ field: { value, onBlur, onChange } }) => (
-                  <InputField
-                    label="State"
-                    textInputConfig={{
-                      maxLength: 50,
-                      onChangeText: onChange,
-                      onBlur: onBlur,
-                      value: value,
-                    }}
-                    style={styles.rowInputField} />
-                )
-                } />
-              <Controller
-                name='postal'
-                rules={{
-                  required: true
-                }}
-                control={control}
-                render={({ field: { onBlur, onChange, value } }) => (
-                  <InputField
-                    label="Postal"
-                    textInputConfig={{
-                      keyboardType: 'numeric',
-                      maxLength: 10,
-                      onChangeText: onChange,
-                      onBlur: onBlur,
-                      value: value,
-                    }}
-                    style={styles.rowInputField} />
-                )} />
-            </View>
+                value={value}
+                style={styles.rowInputField} />
+            )} />
 
-            <View style={styles.inputRow}>
-              <Controller
-                control={control}
-                rules={{
-  
-                }}
-                render={({ field: { onBlur, value, onChange } }) => (
-                  <InputField
-                    label="Credit Card Number"
-                    textInputConfig={{
-                      keyboardType: 'numeric',
-                      maxLength: 19,
-                      onBlur: onBlur,
-                      value: value,
-                      onChangeText: onChange
-                    }}
-                    style={{ flex: 2 }}
-                  />
-                )}
-                name='creditCard' />
-              
-              <Controller
-                control={control}
-                rules={{
-                  required: true
-                }}
-                render={({ field: { onBlur, value, onChange } }) => (
-                  <InputField label="CID" textInputConfig={{
-                    keyboardType: 'numeric',
-                    maxLength: 4,
-                    onBlur: onBlur,
-                    value: value,
-                    onChangeText: onChange,
-                  }}
-                    style={styles.rowInputField} />
-                )}
-                name='cid' />
-              {errors.cid && <Text>This is required.</Text>}
+          <Controller
+            name='country'
+            rules={{
+              required: true
+            }}
+            control={control}
+            render={({ field: { onBlur, onChange, value } }) => (
+              <InputField
+                label="Country"
+                textInputConfig={{
+                  onChangeText: onChange,
+                  onBlur: onBlur,
 
-            </View>
+                }}
+                value={value}
+                style={[styles.rowInputField, { flex: 2 }]} />
+            )} />
         </View>
-      <Button title='Next' onPress={handleSubmit(onSubmit)} />
-    </View >
+
+
+      </View>
+      <CustomButton handlePress={handleSubmit(onSubmit)} title="Enter Payment Details" style={{ marginVertical: 24, marginHorizontal: 24, fontFamily: 'merienda' }} />
+    </ScrollView >
 
   );
 }
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    flex: 1,
+
+  },
   form: {
     flex: 1,
   },
@@ -219,5 +258,10 @@ const styles = StyleSheet.create({
   },
   rowInputField: {
     flex: 1,
-  }
+  },
+  cardField: {
+    width: '100%',
+    marginVertical: 30,
+    height: 150,
+  },
 });

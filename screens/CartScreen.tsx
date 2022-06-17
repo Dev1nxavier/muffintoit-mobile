@@ -4,25 +4,32 @@ import { Image, FlatList } from "react-native";
 import { RootTabScreenProps } from "../types";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
-import { addProduct, subtractProduct } from "../store/redux/cartSlice";
+import { setCart } from "../store/redux/cartSlice";
 import { FontAwesome } from '@expo/vector-icons';
+import { updateCartProduct } from '../util/eCommerce'
 
 
 
 const CartItem = ({ item }) => {
+    const cartId = useSelector(state => state.cartState.cartId)
 
     const dispatch = useDispatch();
 
-    const subtractProductHandler = () => {
-        dispatch(subtractProduct({ ...item }));
+    const handleUpdateCart = (cart: any) => dispatch(setCart({ ...cart }))
+
+    const subtractProductHandler = async () => {
+        let cart;
+        if (item.qty > 1) {
+            cart = await updateCartProduct(cartId, item.lineItemId, { quantity: item.qty - 1 })
+        }else{
+            cart = await updateCartProduct(cartId, item.lineItemId, {quantity:0})
+        }
+        handleUpdateCart(cart);
     }
 
-    const addProductHandler = () => {
-        dispatch(addProduct({ ...item }));
-    }
-
-    const handlePress = (item) => {
-        console.log("data:", item);
+    const addProductHandler = async () => {
+        const cart = await updateCartProduct(cartId, item.lineItemId, { quantity: item.qty + 1 })
+        handleUpdateCart(cart);
     }
 
     return (
@@ -41,11 +48,11 @@ const CartItem = ({ item }) => {
 
                 }}>
                 <Pressable
-                    onPress={() => handlePress(item)}
+                    
                     style={({ pressed }) => ({
                         opacity: pressed ? 0.5 : 1,
                     })}>
-                    <Image source={item.imageUri} style={{ width: 100, height: 100, borderRadius: 15 }} />
+                    <Image source={{ uri: `${item.imageUri}` }} style={{ width: 100, height: 100, borderRadius: 15 }} />
                 </Pressable>
                 <View style={{ height: 100, flex: 1, flexDirection: 'column', justifyContent: 'space-evenly' }}>
                     <Text style={[styles.title, { marginLeft: 10 }]}>{item.title}</Text>
@@ -65,7 +72,7 @@ const CartItem = ({ item }) => {
     )
 }
 
-const CartScreen = ({ navigation }: RootTabScreenProps<'Cart'>)=>{
+const CartScreen = ({ navigation }: RootTabScreenProps<'Cart'>) => {
 
     const [cartItems, setCartItems] = useState(null);
     let CART_STATE = useSelector(state => state.cartState);
@@ -74,12 +81,15 @@ const CartScreen = ({ navigation }: RootTabScreenProps<'Cart'>)=>{
     let CART_TOTAL = '';
 
     useEffect(() => {
-        function getCartState() {
+
+        async function getCartState() {
+            //inside CartScreen->getCartState
             setCartItems(CART_STATE);
+
         }
-    
+
         getCartState();
-       
+
 
     }, [CART_STATE])
 
@@ -89,8 +99,8 @@ const CartScreen = ({ navigation }: RootTabScreenProps<'Cart'>)=>{
         CART_TOTAL = cartItems?.subtotal;
     }
 
+    const handleSubmit = async () => {
 
-    const handleSubmit = () => {
         navigation.navigate("Checkout")
     }
 
@@ -105,7 +115,6 @@ const CartScreen = ({ navigation }: RootTabScreenProps<'Cart'>)=>{
                     No Items In Cart
                 </Text>
             </View>
-
         )
     }
 

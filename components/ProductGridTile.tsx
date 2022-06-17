@@ -2,13 +2,13 @@ import React, { Component } from 'react'
 import { View, Text, TouchableOpacity, Image, StyleSheet, Platform } from 'react-native';
 
 
-const ProductGridTile = ({ title, imageUri, onPress, price, }) => {
+const ProductGridTile = ({ title, imageUri, onPress, price, }:any) => {
     return (
         <View style={styles.gridItem}>
             <TouchableOpacity onPress={() => onPress(title)}>
                 <View style={styles.innerContainer}>
                     <Image
-                        source={imageUri}
+                        source={{uri:`${imageUri}`}}
                         style={styles.Image}
 
                     />

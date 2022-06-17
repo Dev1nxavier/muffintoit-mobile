@@ -1,9 +1,10 @@
 import React, { Component, Key, useLayoutEffect, useState } from 'react'
 import { Image, Pressable, StyleSheet, Text, View, Platform, Button } from 'react-native';
-import { PRODUCTS, CATEGORIES } from '../data/store-data';
-import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import { PRODUCTS } from '../data/store-data';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useSelector, useDispatch } from 'react-redux';
-import { addProduct, removeProduct } from '../store/redux/cartSlice';
+import { addProduct, removeProduct, setCart } from '../store/redux/cartSlice';
+import { addCartProduct } from '../util/eCommerce'
 
 function ProductDetailsScreen({ route, navigation } : any) {
     type itemObj = {
@@ -17,19 +18,21 @@ function ProductDetailsScreen({ route, navigation } : any) {
     
 
     const productId = route.params.id;
-    const [isAdded, setIsAdded] = useState(false);
+
+    const PRODUCTS = useSelector(state=>state.productState.loadProducts);
+
+    const cartId = useSelector(state=>state.cartState.cartId)
+    console.log("Current Cart State:",cartId);
 
     const [productDetails] = PRODUCTS.filter(item => item.id === productId);
 
-    const { id, title, price, shippingMethod, imageUri } = productDetails;
+    const { id, title, price, imageUri } = productDetails;
 
     const dispatch = useDispatch();
 
     //retrieve products from store
     const cartItems = useSelector((state : stateObj) => state.cartState.products);
 
-    //bool for isAddedToStore
-    // const cartItemStatus = cartItems.includes(id);
     const cartItemStatus = cartItems.find((item:itemObj)=>item.id === id);
 
     const headerButtonPressHandler = async () => {
@@ -38,7 +41,10 @@ function ProductDetailsScreen({ route, navigation } : any) {
             dispatch(removeProduct({...productDetails}));
 
         }else{
-            dispatch(addProduct({...productDetails, qty: 1}));
+            //POST to CMS
+            const cart = await addCartProduct(cartId,productId)
+        
+            dispatch(setCart({...cart}));
             
         }
     }
@@ -68,7 +74,7 @@ function ProductDetailsScreen({ route, navigation } : any) {
             <Pressable style={styles.pressable}>
                 <View style={styles.innerContainer}>
                     <Image
-                        source={imageUri}
+                        source={{uri:`${imageUri}`}}
                         style={styles.image} />
                     <Text style={styles.title}>
                         {title}
@@ -76,9 +82,6 @@ function ProductDetailsScreen({ route, navigation } : any) {
                 </View>
                 <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
-                        <Text style={styles.text}>
-                            {shippingMethod}
-                        </Text>
                         <Text style={styles.text}>
                             {id}
                         </Text>

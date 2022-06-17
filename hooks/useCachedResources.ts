@@ -3,6 +3,7 @@ import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 
+
 export default function useCachedResources() {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
 
@@ -19,8 +20,9 @@ export default function useCachedResources() {
           'merienda-bold': require('../assets/fonts/Merienda-Bold.ttf'),
           'merienda': require('../assets/fonts/Merienda-Regular.ttf'),
         });
+
       } catch (e) {
-        // We might want to provide this error information to an error reporting service
+       //provide error to error reporting service on publish
         console.warn(e);
       } finally {
         setLoadingComplete(true);

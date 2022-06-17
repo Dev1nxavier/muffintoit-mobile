@@ -1,13 +1,17 @@
+import React, { useEffect } from 'react'
 import { createSlice } from '@reduxjs/toolkit'
 
+//reducer desc:  state of current cart
 const initialState ={
     cartId: '',
+    checkout_token:'',
     uniqueItems:null,
     totalCount:null,
     subtotal: 0,
     taxes: 0,
     total:0,
     products:[],
+    live:[],
 };
 
 const cartSlice = createSlice({
@@ -22,7 +26,6 @@ const cartSlice = createSlice({
                 /* 
                 NOTE: redux toolkit. This does not mutate state. 
                 */
-               console.log("store: item exists")
                 item.qty ++;
             }else{
 
@@ -62,7 +65,11 @@ const cartSlice = createSlice({
         clearCart: (state, action)=>{
             return {...state, ...initialState}
         },
-    }
+        setCart:(state, action)=>{
+
+            return {...state, ...action.payload}
+        }
+    },
 });
 
 export const addProduct = cartSlice.actions.addProduct;
@@ -70,4 +77,5 @@ export const removeProduct = cartSlice.actions.removeProduct;
 export const subtractProduct = cartSlice.actions.
 subtractProduct;
 export const clearCart = cartSlice.actions.clearCart;
+export const setCart = cartSlice.actions.setCart;
 export default cartSlice.reducer;

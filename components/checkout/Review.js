@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { updateHistory } from '../../store/redux/userSlice'
 import { clearCart } from '../../store/redux/cartSlice';
 import Order from "../../models/order";
+import CustomButton from "../CustomButton";
 
 export default function Review({ handleStep, setOrderId}) {
 
@@ -28,7 +29,6 @@ export default function Review({ handleStep, setOrderId}) {
             subtotal);
         
         dispatch(updateHistory({...order}))
-        dispatch(clearCart({...order}));
         handleStep()
 
         
@@ -80,9 +80,7 @@ export default function Review({ handleStep, setOrderId}) {
                     ${subtotal}
                 </Text>
             </View>
-
-
-            <Button title="Place your order" onPress={handleSubmit} style={{marginTop: 24}}/>
+            <CustomButton title={"Enter Shipping"} handlePress={handleSubmit}/>
 
         </View>
     )
@@ -114,6 +112,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width:'100%',
         marginVertical: 16,
+    },
+    button:{
+        marginTop:24,
     }
 
 })

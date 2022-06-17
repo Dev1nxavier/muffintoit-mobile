@@ -1,16 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+//reducer desc: user details
 const userSlice = createSlice({
     name: 'user',
     initialState: {
-        firstName: '',
-        lastName: '',
-        creditCard: '',
-        cid: '',
+        customerid:'',
+        firstname: '',
+        lastname: '',
         city: '',
         state:'',
         street: '',
+        country:'',
         postal: '',
+        email: '',
         comments: '',
         orderHistory:[],
     },

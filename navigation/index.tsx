@@ -22,8 +22,41 @@ import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../typ
 import LinkingConfiguration from './LinkingConfiguration';
 import ProductDetailsScreen from '../screens/ProductDetailsScreen';
 import CustomHeader from '../components/CustomHeader';
+import { setCart } from '../store/redux/cartSlice';
+import { retrieveCart } from '../util/eCommerce'
+import { useDispatch } from 'react-redux';
+import { setCategories } from '../store/redux/productsSlice';
+import { getCategories } from '../util/eCommerce';
+import { setProducts } from '../store/redux/productsSlice';
+import { getProducts } from '../util/eCommerce';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
+
+  const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    //fetch cart
+    async function fetchCart() {
+      const cart = await retrieveCart();
+      dispatch(setCart({...cart}));
+    }
+    async function fetchCategories() {
+      const categories = await getCategories();
+      dispatch(setCategories(categories));
+    }
+
+    async function fetchProducts() {
+      const data= await getProducts();
+      dispatch(setProducts(data));
+    }
+
+    fetchCategories();
+    fetchCart();
+    fetchProducts();
+
+
+  }, [])
+
   return (
     <NavigationContainer
       linking={LinkingConfiguration}
